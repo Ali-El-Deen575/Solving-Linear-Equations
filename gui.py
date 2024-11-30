@@ -1,5 +1,6 @@
 
 import numpy as np
+import time
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
@@ -102,19 +103,25 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
     def findSol(self):
         if(self.method.currentText()=="Gauss Elimination"):
             gaussElem = GaussElemination(self.system.coff,self.system.sol,self.system.sig)
+            startTime = time.time()
             if(gaussElem.forwardElemination(0,0)):
                 res = gaussElem.apply()
+                EndTime = time.time()
                 for i in range(len(res)):
                     self.result.setText(self.result.text()+f"X{i+1} = {res[i]}\n")
+                self.time.setText(f"{EndTime - startTime}")    
             else:
                 self.result.setText("System has No Solution OR infinite Number of Solutions")  
         
         elif(self.method.currentText()=="Gauss Jordan"):
             gaussJor = GaussJordan(self.system.coff,self.system.sol,self.system.sig)
+            startTime = time.time()
             if(gaussJor.forwardElimination()):
                 res = gaussJor.apply()
+                EndTime = time.time()
                 for i in range(len(res)):
                     self.result.setText(self.result.text()+f"X{i+1} = {res[i]}\n")
+                self.time.setText(f"{EndTime - startTime}")    
             else:
                 self.result.setText("System has No Solution OR infinite Number of Solutions")          
         
@@ -134,10 +141,13 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                     if(Guess is None or (all(isinstance(x, (int, float)) for x in Guess) and len(Guess) == len(self.system.sol))):
                         Iteration = None if iterations =="" else int(iterations)
                         Error = None if error =="" else float(error)
+                        startTime = time.time()
                         jacobi = Jacobi(self.system.coff,self.system.sol,Guess,Iteration,Error,self.system.sig)
                         res = jacobi.apply()
+                        EndTime = time.time()
                         for i in range(len(res)):
                             self.result.setText(self.result.text()+f"X{i+1} = {res[i]}\n")
+                        self.time.setText(f"{EndTime - startTime}")     
         
         elif(self.method.currentText()=="Gauss sidel"):
             guess = self.InitialGuess.text()
@@ -149,10 +159,13 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                     if(Guess is None or (all(isinstance(x, (int, float)) for x in Guess) and len(Guess) == len(self.system.sol))):
                         Iteration = None if iterations =="" else int(iterations)
                         Error = None if error =="" else float(error)
+                        startTime = time.time()
                         sidel = GaussSeidel(self.system.coff,self.system.sol,Guess,Iteration,Error,self.system.sig)
                         res = sidel.apply()
+                        EndTime = time.time()
                         for i in range(len(res)):
-                            self.result.setText(self.result.text()+f"X{i+1} = {res[i]}\n")                          
+                            self.result.setText(self.result.text()+f"X{i+1} = {res[i]}\n")
+                        self.time.setText(f"{EndTime - startTime}")                               
 
     def clear(self):
         self.system=Equations(0)
