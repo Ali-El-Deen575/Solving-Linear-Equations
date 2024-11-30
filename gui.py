@@ -169,11 +169,17 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
 
     def clear(self):
         self.system=Equations(0)
-        self.No.setText("")
+        self.No.setText("n=")
+        self.NoEqn.setText("")
         self.var.setText("")
         self.result.setText("")
         self.Eqn.setText("")
-        self.NoEqn.setText("")
+        self.InitialGuess.setText("")
+        self.IterationNumber.setText("")
+        self.StoppingCondition.setText("")
+        self.time.setText("")
+        self.Iterations.setText("")
+        self.SigFigures.setText("")
     
     def isWholeNumber(self, s):
         try:
