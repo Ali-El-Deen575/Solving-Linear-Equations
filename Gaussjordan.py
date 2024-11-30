@@ -8,7 +8,6 @@ class GaussJordan(Method):
         super().__init__(coff, sol, sig)
 
     def apply(self):
-        self.forwardElimination()
         self.reducedEchelon()
         return self.sol  # Round final results for presentation
 
@@ -18,7 +17,7 @@ class GaussJordan(Method):
             self.pivoting(i, i)  # Ensure pivoting for numerical stability
             pivot = self.coff[i, i]
             if pivot == 0:
-                raise ValueError("Singular matrix detected!")
+                return False
 
             # Normalize pivot row
             self.coff[i] = self.sign_array(self.coff[i] / pivot)  # Normalize and round
@@ -29,6 +28,7 @@ class GaussJordan(Method):
                 factor = self.coff[j, i]
                 self.coff[j] = self.sign_array(self.coff[j] - factor * self.coff[i])  # Eliminate and round
                 self.sol[j] = self.sign(self.sol[j] - factor * self.sol[i])           # Round solution
+        return True        
 
     def reducedEchelon(self):
         n = len(self.coff)
@@ -38,8 +38,7 @@ class GaussJordan(Method):
                 factor = self.coff[j, i]
                 self.coff[j] = self.sign_array(self.coff[j] - factor * self.coff[i])
                 self.sol[j] = self.sign(self.sol[j] - factor * self.sol[i])
-    def sign_array(self, array):
-        return np.array([self.sign(val) for val in array]) 
+    
                
 sol = np.array([7, 12, 13])
 sol = sol.astype(float)

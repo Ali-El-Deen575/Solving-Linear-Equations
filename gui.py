@@ -102,15 +102,21 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
     def findSol(self):
         if(self.method.currentText()=="Gauss Elimination"):
             gaussElem = GaussElemination(self.system.coff,self.system.sol,self.system.sig)
-            res = gaussElem.apply()
-            for i in range(len(res)):
-                self.result.setText(self.result.text()+f"X{i+1} = {res[i]}\n")
+            if(gaussElem.forwardElemination(0,0)):
+                res = gaussElem.apply()
+                for i in range(len(res)):
+                    self.result.setText(self.result.text()+f"X{i+1} = {res[i]}\n")
+            else:
+                self.result.setText("System has No Solution OR infinite Number of Solutions")  
         
         elif(self.method.currentText()=="Gauss Jordan"):
             gaussJor = GaussJordan(self.system.coff,self.system.sol,self.system.sig)
-            res = gaussJor.apply()
-            for i in range(len(res)):
-                self.result.setText(self.result.text()+f"X{i+1} = {res[i]}\n")
+            if(gaussJor.forwardElimination()):
+                res = gaussJor.apply()
+                for i in range(len(res)):
+                    self.result.setText(self.result.text()+f"X{i+1} = {res[i]}\n")
+            else:
+                self.result.setText("System has No Solution OR infinite Number of Solutions")          
         
         elif(self.method.currentText()=="LU Decompostion"):
             gauss = GaussElemination(self.system.coff,self.system.sol,self.system.sig)

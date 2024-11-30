@@ -41,6 +41,9 @@ class Method():
     
     def forwardElemination(self,i,j):                 
         self.pivoting(i,j)
+        pivot = self.coff[i, i]
+        if pivot == 0:
+            return False
         for k in range (i+1,len(self.coff)):
             m = self.coff[k,j]/self.coff[i,j]
             self.coff[k,j] =0
@@ -50,9 +53,9 @@ class Method():
                 self.coff[k,l] -= m*self.coff[i,l]
                 self.coff[k,l]= self.sign(self.coff[k,l]) 
         if(i == len(self.coff)-1 and j == len(self.coff)-1):
-            return
+            return True
         else:        
-            self.forwardElemination(i+1,j+1)
+           return self.forwardElemination(i+1,j+1)
 
     def backSub(self):
 
@@ -77,7 +80,13 @@ class Method():
         magnitude = math.floor(math.log10(abs(value)))
         scale =  10 ** (self.sig -1 - magnitude)
         rounded = round(value * scale) / scale
-        return rounded 
+        return rounded
+    
+    def sign_array(self, array):
+        return np.array([self.sign(val) for val in array]) 
+    
+   
+         
 
 
 

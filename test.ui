@@ -298,7 +298,7 @@
      <string/>
     </property>
     <property name="placeholderText">
-     <string>Default : 3</string>
+     <string/>
     </property>
    </widget>
    <widget class="QLabel" name="InitiaGuessLabel">
@@ -324,7 +324,7 @@
      </rect>
     </property>
     <property name="placeholderText">
-     <string>Default : zeros</string>
+     <string>Default : zeros, Enter:0,0,0</string>
     </property>
    </widget>
    <widget class="QGroupBox" name="groupBox">

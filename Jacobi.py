@@ -53,13 +53,7 @@ class Jacobi(Method):
                     break
                 x = y
             return x
-    def sign (self,value):
-        if value == 0:
-            return 0
-        magnitude = math.floor(math.log10(abs(value)))
-        scale =  10 ** (self.sig -1 - magnitude)
-        rounded = round(value * scale) / scale
-        return rounded     
+
 
     
        

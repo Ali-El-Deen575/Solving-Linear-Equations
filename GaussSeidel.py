@@ -51,13 +51,7 @@ class GaussSeidel(Method):
                 if np.linalg.norm(np.dot(self.coff,x)-self.sol,np.inf) < (self.tol*max(1.0,np.linalg.norm(x,np.inf))):
                     break
             return x
-    def sign (self,value):
-        if value == 0:
-            return 0
-        magnitude = math.floor(math.log10(abs(value)))
-        scale =  10 ** (self.sig -1 - magnitude)
-        rounded = round(value * scale) / scale
-        return rounded         
+
 sol = np.array([7, 12, 13])
 coff = np.array([[3, 2, -1],[1, 3, 2],[2, -1, 4]])
 guess = np.array([0,0,0])
