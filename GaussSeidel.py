@@ -27,8 +27,8 @@ class GaussSeidel(Method):
                     x[i]=(self.sol[i]-s1-s2)/self.coff[i,i]
                     x[i] =self.sign(x[i])
                 if np.linalg.norm(np.dot(self.coff,x)-self.sol,np.inf) < (self.tol*max(1.0,np.linalg.norm(x,np.inf))):
-                    return x
-            return x
+                    return x , z+1
+            return x , self.iter
         elif self.iter !=None:
             for z in range(self.iter):
                 for i in range(self.n):
@@ -38,9 +38,11 @@ class GaussSeidel(Method):
                     s2 = self.sign(s2)
                     x[i]=(self.sol[i]-s1-s2)/self.coff[i,i]
                     x[i] =self.sign(x[i])
-            return x
+            return x ,self.iter
         else:
+            iteration = 0
             while True:
+                iteration += 1
                 for i in range(self.n):
                     s1=sum(self.coff[i][j]*x[j] for j in range(i))
                     s2=sum(self.coff[i][j]*x[j] for j in range(i + 1, self.n))
@@ -50,7 +52,7 @@ class GaussSeidel(Method):
                     x[i] =self.sign(x[i])
                 if np.linalg.norm(np.dot(self.coff,x)-self.sol,np.inf) < (self.tol*max(1.0,np.linalg.norm(x,np.inf))):
                     break
-            return x
+            return x , iteration
 
 sol = np.array([7, 12, 13])
 coff = np.array([[3, 2, -1],[1, 3, 2],[2, -1, 4]])

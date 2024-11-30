@@ -143,11 +143,12 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                         Error = None if error =="" else float(error)
                         startTime = time.time()
                         jacobi = Jacobi(self.system.coff,self.system.sol,Guess,Iteration,Error,self.system.sig)
-                        res = jacobi.apply()
+                        res,it = jacobi.apply()
                         EndTime = time.time()
                         for i in range(len(res)):
                             self.result.setText(self.result.text()+f"X{i+1} = {res[i]}\n")
-                        self.time.setText(f"{EndTime - startTime}")     
+                        self.time.setText(f"{EndTime - startTime}")
+                        self.Iterations.setText(f"{it}")     
         
         elif(self.method.currentText()=="Gauss sidel"):
             guess = self.InitialGuess.text()
@@ -161,11 +162,12 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                         Error = None if error =="" else float(error)
                         startTime = time.time()
                         sidel = GaussSeidel(self.system.coff,self.system.sol,Guess,Iteration,Error,self.system.sig)
-                        res = sidel.apply()
+                        res,it = sidel.apply()
                         EndTime = time.time()
                         for i in range(len(res)):
                             self.result.setText(self.result.text()+f"X{i+1} = {res[i]}\n")
-                        self.time.setText(f"{EndTime - startTime}")                               
+                        self.time.setText(f"{EndTime - startTime}")
+                        self.Iterations.setText(f"{it}")                               
 
     def clear(self):
         self.system=Equations(0)
@@ -180,6 +182,7 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
         self.time.setText("")
         self.Iterations.setText("")
         self.SigFigures.setText("")
+        self.result.setText("")
     
     def isWholeNumber(self, s):
         try:

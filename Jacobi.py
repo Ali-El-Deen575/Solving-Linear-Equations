@@ -27,9 +27,9 @@ class Jacobi(Method):
                     y[i]=(self.sol[i]-s)/self.coff[i,i]
                     y[i] = self.sign(y[i])
                 if np.linalg.norm(y-x,np.inf) < (self.tol*max(1.0,np.linalg.norm(y,np.inf))):
-                    return y
+                    return y , z+1
                 x = y
-            return x
+            return x , self.iter
         elif self.iter !=None:
             for z in range(self.iter):
                 y=np.zeros_like(x)
@@ -39,10 +39,12 @@ class Jacobi(Method):
                     y[i]=(self.sol[i]-s)/self.coff[i,i]
                     y[i] = self.sign(y[i])
                 x = y        
-            return x 
+            return x , self.iter
         else :
             y = np.zeros_like(x)
+            iteration = 0
             while True:
+                iteration += 1
                 y = np.zeros_like(x)
                 for i in range(self.n):
                     s = sum(self.coff[i][j] * x[j] for j in range(self.n) if j != i)
@@ -52,7 +54,7 @@ class Jacobi(Method):
                 if np.linalg.norm(y - x, np.inf) < (self.tol*max(1.0,np.linalg.norm(y,np.inf))):
                     break
                 x = y
-            return x
+            return x , iteration
 
 
     
