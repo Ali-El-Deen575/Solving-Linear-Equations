@@ -108,7 +108,7 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                 res = gaussElem.apply()
                 EndTime = time.time()
                 for i in range(len(res)):
-                    self.result.setText(self.result.text()+f"X{i+1} = {res[i]}\n")
+                    self.result.setText(self.result.toPlainText()+f"X{i+1} = {res[i]}\n")
                 self.time.setText(f"{EndTime - startTime}")    
             else:
                 self.result.setText("System has No Solution OR infinite Number of Solutions")  
@@ -120,7 +120,7 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                 res = gaussJor.apply()
                 EndTime = time.time()
                 for i in range(len(res)):
-                    self.result.setText(self.result.text()+f"X{i+1} = {res[i]}\n")
+                    self.result.setText(self.result.toPlainText()+f"X{i+1} = {res[i]}\n")
                 self.time.setText(f"{EndTime - startTime}")    
             else:
                 self.result.setText("System has No Solution OR infinite Number of Solutions")          
@@ -129,7 +129,7 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
             gauss = GaussElemination(self.system.coff,self.system.sol,self.system.sig)
             res = gauss.apply()
             for i in range(len(res)):
-                self.result.setText(self.result.text()+f"X{i+1} = {res[i]}\n")
+                self.result.setText(self.result.toPlainText()+f"X{i+1} = {res[i]}\n")
         
         elif(self.method.currentText()=="Jacobi"):
             guess = self.InitialGuess.text()
@@ -146,7 +146,7 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                         res,it = jacobi.apply()
                         EndTime = time.time()
                         for i in range(len(res)):
-                            self.result.setText(self.result.text()+f"X{i+1} = {res[i]}\n")
+                            self.result.setText(self.result.toPlainText()+f"X{i+1} = {res[i]}\n")
                         self.time.setText(f"{EndTime - startTime}")
                         self.Iterations.setText(f"{it}")     
         
@@ -165,7 +165,7 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                         res,it = sidel.apply()
                         EndTime = time.time()
                         for i in range(len(res)):
-                            self.result.setText(self.result.text()+f"X{i+1} = {res[i]}\n")
+                            self.result.setText(self.result.toPlainText()+f"X{i+1} = {res[i]}\n")
                         self.time.setText(f"{EndTime - startTime}")
                         self.Iterations.setText(f"{it}")                               
 
