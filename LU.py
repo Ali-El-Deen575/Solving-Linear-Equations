@@ -7,6 +7,7 @@ class LU(Method):
 
     
     def dooLittle(self , a, tolerance=1e-7):
+
         n = len(a)
         lower = np.zeros((n, n))
         upper = np.zeros((n, n))
@@ -56,6 +57,10 @@ class LU(Method):
     
     def cholesky(self, a, tolerance=1e-7):
         n = len(a)
+
+        if not np.allclose(a, a.T, atol=tolerance):
+            raise ValueError("Input matrix must be symmetric")
+        
         lower = np.zeros((n, n))
 
         for i in range(n):
