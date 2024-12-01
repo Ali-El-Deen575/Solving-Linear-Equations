@@ -18,7 +18,7 @@ import sys
 mainWindowFileName = "test.ui"                
 FORM_CLASS, _ = loadUiType(path.join(path.dirname(__file__), mainWindowFileName))
     
-app = QApplication(sys.argv)
+#app = QApplication(sys.argv)
          
 
 class Ui_MainWindow(QMainWindow,FORM_CLASS):
@@ -234,11 +234,19 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
         except ValueError:
             return [] 
     
-                                
-            
+def loadStylesheet():
+    try:
+        with open("StyleSheet.qss", "r") as file:
+            stylesheet = file.read()
+            QApplication.instance().setStyleSheet(stylesheet)
+    except FileNotFoundError:
+        print("Stylesheet file not found.")
 
-def main():   
-    window = Ui_MainWindow() 
+
+def main():
+    app = QApplication(sys.argv)
+    loadStylesheet()
+    window = Ui_MainWindow()
     window.show()
     app.exec_()
 
