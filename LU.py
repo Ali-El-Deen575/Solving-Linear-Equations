@@ -2,7 +2,7 @@ import numpy as np
 from GaussElemination import GaussElemination
 from Method import Method,Equations
 TOL = 1e-7
-class LU(Method): 
+class LU(Method):
     def __init__(self, coff, sol, method, sig):
         super().__init__(coff, sol, sig)
         self.method = method

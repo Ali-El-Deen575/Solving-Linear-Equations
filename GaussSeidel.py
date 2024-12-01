@@ -57,7 +57,5 @@ class GaussSeidel(Method):
 sol = np.array([7, 12, 13])
 coff = np.array([[3, 2, -1],[1, 3, 2],[2, -1, 4]])
 guess = np.array([0,0,0])
-seidel =GaussSeidel(coff,sol,guess,iter=None,tol=5e-2,sig =3)   
-print(seidel.apply()) 
-
-        
+seidel =GaussSeidel(coff,sol,guess,iter=None,tol=5e-2,sig =3)
+print(seidel.apply())
