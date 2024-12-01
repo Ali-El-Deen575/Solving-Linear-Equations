@@ -25,14 +25,19 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
         QMainWindow.__init__(self)
         self.setupUi(self)
         self.system=Equations(0)
+        self.scaling = False
         self.EnterNo.clicked.connect(self.setNoEqn)
         self.EnterEqn.clicked.connect(self.setEqn)
         self.FindSol.clicked.connect(self.findSol)
         self.Clear.clicked.connect(self.clear)
         self.EnterSigFigures.clicked.connect(self.setSigNo)
         self.method.currentTextChanged.connect(self.parameters)
+        self.ScalingCheckBox.stateChanged.connect(self.toggleScaling)
         self.parameters()
 
+    def toggleScaling(self, state):
+        if state == QtCore.Qt.Checked:
+            self.scaling = True
 
     def parameters (self):
         if(self.method.currentText()=="Gauss Elimination" or self.method.currentText()=="Gauss Jordan") :
@@ -100,48 +105,52 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                     self.var.setText("")
 
     def findSol(self):
+        if self.scaling:
+            self.system.coff, self.system.sol = self.scale_matrix(self.system.coff,self.system.sol)
+
+        print(self.system.coff)
+        print(self.system.sol)
         if(self.method.currentText()=="Gauss Elimination"):
             gaussElem = GaussElemination(self.system.coff,self.system.sol,self.system.sig)
             startTime = time.time()
-            try:   
+            try:
                 gaussElem.forwardElemination(0,0)
             except ValueError as e:
                 self.result.setText(f"{e}")
-            else:         
+            else:
                 res = gaussElem.apply()
                 EndTime = time.time()
                 for i in range(len(res)):
                     self.result.setText(self.result.toPlainText()+f"X{i+1} = {res[i]}\n")
-                self.time.setText(f"{EndTime - startTime}")    
- 
+                self.time.setText(f"{EndTime - startTime}")
+
         
         elif(self.method.currentText()=="Gauss Jordan"):
             gaussJor = GaussJordan(self.system.coff,self.system.sol,self.system.sig)
             startTime = time.time()
-            try:   
+            try:
                 gaussJor.forwardElimination()
             except ValueError as e:
                 self.result.setText(f"{e}")
-            else:         
+            else:
                 res = gaussJor.apply()
                 EndTime = time.time()
                 for i in range(len(res)):
                     self.result.setText(self.result.toPlainText()+f"X{i+1} = {res[i]}\n")
-                self.time.setText(f"{EndTime - startTime}")    
-         
-        
+                self.time.setText(f"{EndTime - startTime}")
+
         elif(self.method.currentText()=="LU decompostion"):
             lu = LU(self.system.coff,self.system.sol,self.Parameters.currentText(),self.system.sig)
             startTime = time.time()
-            try:   
+            try:
                 res = lu.apply()
             except ValueError as e:
                 self.result.setText(f"{e}")
-            else:         
+            else:
                 EndTime = time.time()
                 for i in range(len(res)):
                     self.result.setText(self.result.toPlainText()+f"X{i+1} = {res[i]}\n")
-                self.time.setText(f"{EndTime - startTime}")    
+                self.time.setText(f"{EndTime - startTime}")
         
         elif(self.method.currentText()=="Jacobi"):
             guess = self.InitialGuess.text()
@@ -180,6 +189,15 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                             self.result.setText(self.result.toPlainText()+f"X{i+1} = {res[i]}\n")
                         self.time.setText(f"{EndTime - startTime}")
                         self.Iterations.setText(f"{it}")
+
+    def scale_matrix(self, A, B):
+        n = A.shape[0]
+        for i in range(n):
+            row_max = max(abs(A[i, j]) for j in range(n))
+            if row_max != 0:
+                A[i, :] = A[i, :] / row_max
+                B[i] = B[i] / row_max
+        return A, B
 
     def clear(self):
         self.system=Equations(0)

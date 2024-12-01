@@ -83,8 +83,7 @@ QScrollArea {
     background-color: rgb(245, 245, 245);
 }
 
-
-/* Prevent Overlaps */
+/* Prevent Overlaps (Removed overflow property) */
 QWidget {
-    overflow: hidden; /* Ensures text stays within widget boundaries */
+    /* overflow: hidden; */ /* This line is removed */
 }

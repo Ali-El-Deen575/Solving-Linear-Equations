@@ -48,7 +48,7 @@ class LU(Method):
                     lower[j, i] = self.sign((self.coff[j, i] - sum) / upper[i, i])
         
         # Solving using lower
- 
+
         outer = GaussElemination(lower,self.sol,self.sig)
         Y = outer.forwardSub()
         inner = GaussElemination(upper,Y,self.sig)
@@ -124,7 +124,7 @@ sol = np.array([7, 12, 13])
 #sol = sol.astype(float)
 coff = np.array([[6, 15, 55],[15, 55, 225],[55, 225, 979]])
 #coff = coff.astype(float)
-jr =LU(coff,sol,"Crout",5)   
+jr =LU(coff,sol,"Crout",5)
 print(jr.apply())
-print(np.linalg.solve(coff,sol))        
+print(np.linalg.solve(coff,sol))
 
