@@ -75,7 +75,11 @@ class LU(Method):
                 for k in range(j):
                     sum += self.sign(lower[j, k] * upper[k, i])
                 if abs(lower[j, j]) < TOL:
-                    raise ValueError("Singular Matrix")
+
+
+                if self.step_by_step:
+                        print(f"product is almost 0 which means it's a singular matrix")
+                    raise ZeroDivisionError("Singular Matrix")
                 upper[j, i] = self.sign((self.coff[j, i] - sum) / lower[j, j])
 
         # Solving using lower

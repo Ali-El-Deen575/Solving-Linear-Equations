@@ -45,6 +45,10 @@ class Method():
         if pivot == 0 and self.sol[i] == 0:
             raise ValueError("Infinite Number of Solutions")
         if pivot == 0:
+
+          if self.step_by_step:
+                print(f"pivot = 0 , No Solution (Singular matrix)")
+                print(f"**** Forward elemination on a{i}{j} end ****")
             raise ValueError("No Solution (Singular matrix)")
         for k in range (i+1,len(self.coff)):
             m = self.coff[k,j]/self.coff[i,j]
