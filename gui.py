@@ -18,7 +18,7 @@ import sys
 mainWindowFileName = "test.ui"                
 FORM_CLASS, _ = loadUiType(path.join(path.dirname(__file__), mainWindowFileName))
     
-#app = QApplication(sys.argv)
+
          
 
 class Ui_MainWindow(QMainWindow,FORM_CLASS):
@@ -113,9 +113,13 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
         print(self.system.coff)
         print(self.system.sol)
         if(self.method.currentText()=="Gauss Elimination"):
-            gaussElem = GaussElemination(self.system.coff,self.system.sol,self.system.sig)
+            A = np.array(self.system.coff)
+            B = np.array(self.system.sol)
+            gaussElem = GaussElemination(A,B,self.system.sig)
             startTime = time.time()
-            try:
+            self.result.setText("")
+            self.view.setText(self.showEquations())
+            try:                
                 gaussElem.forwardElemination(0,0)
             except ValueError as e:
                 self.result.setText(f"{e}")
@@ -125,11 +129,16 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                 for i in range(len(res)):
                     self.result.setText(self.result.toPlainText()+f"X{i+1} = {res[i]}\n")
                 self.time.setText(f"{EndTime - startTime}")
+                
 
         
         elif(self.method.currentText()=="Gauss Jordan"):
-            gaussJor = GaussJordan(self.system.coff,self.system.sol,self.system.sig)
+            A = np.array(self.system.coff)
+            B = np.array(self.system.sol)
+            gaussJor = GaussJordan(A,B,self.system.sig)
             startTime = time.time()
+            self.result.setText("")
+            self.view.setText(self.showEquations())
             try:
                 gaussJor.forwardElimination()
             except ValueError as e:
@@ -142,9 +151,13 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                 self.time.setText(f"{EndTime - startTime}")
 
         elif(self.method.currentText()=="LU decompostion"):
+            A = np.array(self.system.coff)
+            B = np.array(self.system.sol)
             method = str(self.Parameters.currentText())
-            lu = LU(self.system.coff,self.system.sol,method,self.system.sig)
+            lu = LU(A,B,method,self.system.sig)
             startTime = time.time()
+            self.result.setText("")
+            self.view.setText(self.showEquations())
             try:
                 res = lu.apply()
             except ValueError as e:
@@ -156,6 +169,8 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                 self.time.setText(f"{EndTime - startTime}")
         
         elif(self.method.currentText()=="Jacobi"):
+            A = np.array(self.system.coff)
+            B = np.array(self.system.sol)
             guess = self.InitialGuess.text()
             Guess = None if guess == "" else self.extractNumbers(guess) 
             iterations =self.IterationNumber.text()
@@ -166,15 +181,23 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                         Iteration = None if iterations =="" else int(iterations)
                         Error = None if error =="" else float(error)
                         startTime = time.time()
-                        jacobi = Jacobi(self.system.coff,self.system.sol,Guess,Iteration,Error,self.system.sig)
-                        res,it = jacobi.apply()
-                        EndTime = time.time()
-                        for i in range(len(res)):
-                            self.result.setText(self.result.toPlainText()+f"X{i+1} = {res[i]}\n")
-                        self.time.setText(f"{EndTime - startTime}")
-                        self.Iterations.setText(f"{it}")     
+                        self.result.setText("")
+                        self.view.setText(self.showEquations())
+                        try :
+                            jacobi = Jacobi(A,B,Guess,Iteration,Error,self.system.sig)                           
+                        except ValueError as e:
+                            self.result.setText(f"{e}")
+                        else :    
+                            res,it = jacobi.apply()        
+                            EndTime = time.time()
+                            for i in range(len(res)):
+                                self.result.setText(self.result.toPlainText()+f"X{i+1} = {res[i]}\n")
+                            self.time.setText(f"{EndTime - startTime}")
+                            self.Iterations.setText(f"{it}")     
         
         elif(self.method.currentText()=="Gauss sidel"):
+            A = np.array(self.system.coff)
+            B = np.array(self.system.sol)
             guess = self.InitialGuess.text()
             Guess = None if guess == "" else self.extractNumbers(guess) 
             iterations =self.IterationNumber.text()
@@ -185,13 +208,19 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                         Iteration = None if iterations =="" else int(iterations)
                         Error = None if error =="" else float(error)
                         startTime = time.time()
-                        sidel = GaussSeidel(self.system.coff,self.system.sol,Guess,Iteration,Error,self.system.sig)
-                        res,it = sidel.apply()
-                        EndTime = time.time()
-                        for i in range(len(res)):
-                            self.result.setText(self.result.toPlainText()+f"X{i+1} = {res[i]}\n")
-                        self.time.setText(f"{EndTime - startTime}")
-                        self.Iterations.setText(f"{it}")                               
+                        self.result.setText("")
+                        self.view.setText(self.showEquations())
+                        try :
+                            sd = GaussSeidel(A,B,Guess,Iteration,Error,self.system.sig)                           
+                        except ValueError as e:
+                            self.result.setText(f"{e}")
+                        else :          
+                            res,it = sd.apply()
+                            EndTime = time.time()
+                            for i in range(len(res)):
+                                self.result.setText(self.result.toPlainText()+f"X{i+1} = {res[i]}\n")
+                            self.time.setText(f"{EndTime - startTime}")
+                            self.Iterations.setText(f"{it}")                               
 
     def scale_matrix(self, A, B):
         n = A.shape[0]
@@ -232,7 +261,18 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
             numbers = [float(num) for num in numbers]           
             return numbers
         except ValueError:
-            return [] 
+            return []
+    def showEquations(self):
+        eqn =  ""
+        for i in range(len(self.system.sol)):
+            for j in range(len(self.system.sol)):
+                if j == len(self.system.sol)-1:
+                    eqn += f"({self.system.coff[i,j]}) X{j+1} ="
+                else:
+                    eqn += f"({self.system.coff[i,j]}) X{j+1} +"
+            eqn +=  f"{self.system.sol[i]}\n"
+        return eqn      
+
     
 def loadStylesheet():
     try:

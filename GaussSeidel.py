@@ -11,6 +11,10 @@ class GaussSeidel(Method):
         self.iter=iter
         self.tol=tol
         self.n=len(sol)
+        for i in range(self.n):
+            row_sum = sum(abs(self.coff[i][j]) for j in range(self.n) if j != i)
+            if abs(self.coff[i][i]) < row_sum:
+                raise ValueError(f"Matrix is not diagonally dominant at row {i}")
 
     def apply(self):
         if self.guess is not None:
