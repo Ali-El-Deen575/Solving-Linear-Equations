@@ -231,6 +231,15 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                 B[i] = B[i] / row_max
         return A, B
 
+    def scale_matrix(self, A, B):
+        n = A.shape[0]
+        for i in range(n):
+            row_max = max(abs(A[i, j]) for j in range(n))
+            if row_max != 0:
+                A[i, :] = A[i, :] / row_max
+                B[i] = B[i] / row_max
+        return A, B
+
     def clear(self):
         self.system=Equations(0)
         self.No.setText("n=")
