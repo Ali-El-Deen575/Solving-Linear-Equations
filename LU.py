@@ -1,7 +1,7 @@
 import numpy as np
 from Method import Method,Equations
 TOL = 1e-7
-class LU(Method): 
+class LU(Method):
     def __init__(self, coff, sol, method, sig):
         super().__init__(coff, sol, sig)
         self.method = method
@@ -47,7 +47,7 @@ class LU(Method):
                     lower[j, i] = self.sign((self.coff[j, i] - sum) / upper[i, i])
         
         # Solving using lower
-        temp = self.coff 
+        temp = self.coff
         self.coff = lower
         self.sol = self.backSub()
         self.coff = temp
@@ -77,7 +77,7 @@ class LU(Method):
                 upper[j, i] = self.sign((self.coff[j, i] - sum) / lower[j, j])
 
         # Solving using lower
-        temp = self.coff 
+        temp = self.coff
         self.coff = lower
         self.sol = self.backSub()
         self.coff = temp
@@ -113,7 +113,7 @@ class LU(Method):
         # return lower, lower.T
 
         # Solving using lower
-        temp = self.coff 
+        temp = self.coff
         self.coff = lower
         self.sol = self.backSub()
         self.coff = temp

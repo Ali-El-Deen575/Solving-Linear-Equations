@@ -4,7 +4,7 @@ import math
 
 class Jacobi(Method):
     def __init__(self,coff,sol,guess,iter,tol,sig):
-        super().__init__(coff, sol, sig) 
+        super().__init__(coff, sol, sig)
         if guess is not None:
             self.guess=np.array(guess, dtype=float)
         else:
@@ -19,7 +19,7 @@ class Jacobi(Method):
         else:
             x=np.zeros(self.n)
         if (self.iter !=None and self.tol !=None):
-            for z in range(self.iter):               
+            for z in range(self.iter):
                 y=np.zeros_like(x)
                 for i in range(self.n):
                     s=sum(self.coff[i][j] * x[j] for j in range(self.n) if j != i)
@@ -38,7 +38,7 @@ class Jacobi(Method):
                     s = self.sign(s)
                     y[i]=(self.sol[i]-s)/self.coff[i,i]
                     y[i] = self.sign(y[i])
-                x = y        
+                x = y
             return x , self.iter
         else :
             y = np.zeros_like(x)
@@ -57,10 +57,8 @@ class Jacobi(Method):
             return x , iteration
 
 
-    
-       
 sol = np.array([7, 5])
 coff = np.array([[3, 2],[1, 3]])
 guess = np.array([0,0])
-jacobi =Jacobi(coff,sol,guess,iter=3,tol=None,sig=5)   
-print(jacobi.apply()) 
+jacobi =Jacobi(coff,sol,guess,iter=3,tol=None,sig=5)
+print(jacobi.apply())
