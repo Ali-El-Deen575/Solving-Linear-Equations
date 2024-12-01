@@ -10,14 +10,14 @@ from Gaussjordan import GaussJordan
 from LU import LU
 from Jacobi import Jacobi
 from GaussSeidel import GaussSeidel
-from Method import Equations
+from Method import Equations  
 from PyQt5.uic import loadUiType
-from os import path
-import sys
-
-mainWindowFileName = "test.ui"
+from os import path 
+import sys 
+        
+mainWindowFileName = "test.ui"                
 FORM_CLASS, _ = loadUiType(path.join(path.dirname(__file__), mainWindowFileName))
-
+    
 
 class Ui_MainWindow(QMainWindow,FORM_CLASS):
     def __init__(self, parent=None):
@@ -60,7 +60,7 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
             self.IterationLabel.setEnabled(False)
             self.StoppingConditionLabel.setEnabled(False)
 
-
+  
         elif(self.method.currentText()=="Jacobi" or self.method.currentText()=="Gauss sidel") :
             self.ParametersLabel.setEnabled(False)
             self.Parameters.setEnabled(False)
@@ -75,20 +75,20 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
 
     def is_number(self,s):
         try:
-            float(s)
-            return True
+          float(s)
+          return True
         except ValueError:
-            return False
-    def setNoEqn (self):
-        if(self.isWholeNumber(self.NoEqn.text())) :
-            eqnNo = int(self.NoEqn.text())
-            self.No.setText("n= "+str(eqnNo))
-            self.var.setText("a11 = ")
-            self.system =Equations(eqnNo)
-    def setSigNo (self):
-        if(self.isWholeNumber(self.SigFigures.text())) :
-            SigNo = int(self.SigFigures.text())
-            self.system.sig = SigNo
+          return False
+    def setNoEqn (self): 
+      if(self.isWholeNumber(self.NoEqn.text())) :      
+        eqnNo = int(self.NoEqn.text())
+        self.No.setText("n= "+str(eqnNo)) 
+        self.var.setText("a11 = ")
+        self.system =Equations(eqnNo)
+    def setSigNo (self): 
+      if(self.isWholeNumber(self.SigFigures.text())) :      
+        SigNo = int(self.SigFigures.text())
+        self.system.sig = SigNo    
     
     def setEqn(self):
         if(self.is_number(self.Eqn.text())) :
@@ -98,7 +98,7 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                 if(self.system.j < self.system.num and self.system.i < self.system.num):
                     self.var.setText(("a"+str(self.system.i+1)+str(self.system.j+1)+" ="))
                     
-                elif(self.system.i < self.system.num) :
+                elif(self.system.i < self.system.num) :               
                     self.var.setText("b"+str(self.system.i+1)+" =")
                     
                 else:
@@ -111,9 +111,13 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
         print(self.system.coff)
         print(self.system.sol)
         if(self.method.currentText()=="Gauss Elimination"):
-            gaussElem = GaussElemination(self.system.coff,self.system.sol,self.system.sig)
+            A = np.array(self.system.coff)
+            B = np.array(self.system.sol)
+            gaussElem = GaussElemination(A,B,self.system.sig)
             startTime = time.time()
-            try:
+            self.result.setText("")
+            self.view.setText(self.showEquations())
+            try:                
                 gaussElem.forwardElemination(0,0)
             except ValueError as e:
                 self.result.setText(f"{e}")
@@ -123,11 +127,16 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                 for i in range(len(res)):
                     self.result.setText(self.result.toPlainText()+f"X{i+1} = {res[i]}\n")
                 self.time.setText(f"{EndTime - startTime}")
+                
 
         
         elif(self.method.currentText()=="Gauss Jordan"):
-            gaussJor = GaussJordan(self.system.coff,self.system.sol,self.system.sig)
+            A = np.array(self.system.coff)
+            B = np.array(self.system.sol)
+            gaussJor = GaussJordan(A,B,self.system.sig)
             startTime = time.time()
+            self.result.setText("")
+            self.view.setText(self.showEquations())
             try:
                 gaussJor.forwardElimination()
             except ValueError as e:
@@ -140,8 +149,13 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                 self.time.setText(f"{EndTime - startTime}")
 
         elif(self.method.currentText()=="LU decompostion"):
-            lu = LU(self.system.coff,self.system.sol,self.Parameters.currentText(),self.system.sig)
+            A = np.array(self.system.coff)
+            B = np.array(self.system.sol)
+            method = str(self.Parameters.currentText())
+            lu = LU(A,B,method,self.system.sig)
             startTime = time.time()
+            self.result.setText("")
+            self.view.setText(self.showEquations())
             try:
                 res = lu.apply()
             except ValueError as e:
@@ -153,42 +167,55 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                 self.time.setText(f"{EndTime - startTime}")
         
         elif(self.method.currentText()=="Jacobi"):
+            A = np.array(self.system.coff)
+            B = np.array(self.system.sol)
             guess = self.InitialGuess.text()
-            Guess = None if guess == "" else self.extractNumbers(guess)
+            Guess = None if guess == "" else self.extractNumbers(guess) 
             iterations =self.IterationNumber.text()
-            error = self.StoppingCondition.text()
+            error = self.StoppingCondition.text()           
             if not(iterations == "" and error == ""):
                 if(self.isWholeNumber(iterations) or iterations == "") and (self.is_number(error) or error == ""):
                     if(Guess is None or (all(isinstance(x, (int, float)) for x in Guess) and len(Guess) == len(self.system.sol))):
                         Iteration = None if iterations =="" else int(iterations)
                         Error = None if error =="" else float(error)
                         startTime = time.time()
-                        jacobi = Jacobi(self.system.coff,self.system.sol,Guess,Iteration,Error,self.system.sig)
-                        res,it = jacobi.apply()
-                        EndTime = time.time()
-                        for i in range(len(res)):
-                            self.result.setText(self.result.toPlainText()+f"X{i+1} = {res[i]}\n")
-                        self.time.setText(f"{EndTime - startTime}")
-                        self.Iterations.setText(f"{it}")
+                        self.result.setText("")
+                        self.view.setText(self.showEquations())
+                        try :
+                            jacobi = Jacobi(A,B,Guess,Iteration,Error,self.system.sig)
+                           
+                        except ValueError as e:
+                            self.result.setText(f"{e}")
+                        else :    
+                            res,it = jacobi.apply()        
+                            EndTime = time.time()
+                            for i in range(len(res)):
+                                self.result.setText(self.result.toPlainText()+f"X{i+1} = {res[i]}\n")
+                            self.time.setText(f"{EndTime - startTime}")
+                            self.Iterations.setText(f"{it}")     
         
         elif(self.method.currentText()=="Gauss sidel"):
+            A = np.array(self.system.coff)
+            B = np.array(self.system.sol)
             guess = self.InitialGuess.text()
-            Guess = None if guess == "" else self.extractNumbers(guess)
+            Guess = None if guess == "" else self.extractNumbers(guess) 
             iterations =self.IterationNumber.text()
-            error = self.StoppingCondition.text()
+            error = self.StoppingCondition.text()           
             if not(iterations == "" and error == ""):
                 if(self.isWholeNumber(iterations) or iterations == "") and (self.is_number(error) or error == ""):
                     if(Guess is None or (all(isinstance(x, (int, float)) for x in Guess) and len(Guess) == len(self.system.sol))):
                         Iteration = None if iterations =="" else int(iterations)
                         Error = None if error =="" else float(error)
                         startTime = time.time()
-                        sidel = GaussSeidel(self.system.coff,self.system.sol,Guess,Iteration,Error,self.system.sig)
+                        self.result.setText("")
+                        self.view.setText(self.showEquations())
+                        sidel = GaussSeidel(A,B,Guess,Iteration,Error,self.system.sig)
                         res,it = sidel.apply()
                         EndTime = time.time()
                         for i in range(len(res)):
                             self.result.setText(self.result.toPlainText()+f"X{i+1} = {res[i]}\n")
                         self.time.setText(f"{EndTime - startTime}")
-                        self.Iterations.setText(f"{it}")
+                        self.Iterations.setText(f"{it}")                               
 
     def scale_matrix(self, A, B):
         n = A.shape[0]
@@ -216,8 +243,8 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
     
     def isWholeNumber(self, s):
         try:
-            number = float(s)
-            if number % 1 == 0:
+            number = float(s)  
+            if number % 1 == 0: 
                 return True
             else:
                 return False
@@ -226,11 +253,22 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
     def extractNumbers(self, s):
         try:
             numbers = s.split(',')
-            numbers = [float(num) for num in numbers]
+            numbers = [float(num) for num in numbers]           
             return numbers
         except ValueError:
             return []
+    def showEquations(self):
+        eqn =  ""
+        for i in range(len(self.system.sol)):
+            for j in range(len(self.system.sol)):
+                if j == len(self.system.sol)-1:
+                    eqn += f"({self.system.coff[i,j]}) X{j+1} ="
+                else:
+                    eqn += f"({self.system.coff[i,j]}) X{j+1} +"
+            eqn +=  f"{self.system.sol[i]}\n"
+        return eqn      
 
+    
 def loadStylesheet():
     try:
         with open("StyleSheet.qss", "r") as file:

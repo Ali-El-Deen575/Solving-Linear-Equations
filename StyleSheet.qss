@@ -75,6 +75,9 @@ QTextBrowser, QPlainTextEdit {
 QTextEdit {
     font-size: 18px;
 }
+QTextEdit#view {
+    font-size: 10px;
+}
 
 /* Scroll Area */
 QScrollArea {

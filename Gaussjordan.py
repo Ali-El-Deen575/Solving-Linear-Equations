@@ -4,22 +4,11 @@ from Method import Method, Equations
 import numpy as np
 
 class GaussJordan(Method):
-    def __init__(self, coff, sol, sig, step_by_step):
-        super().__init__(coff, sol, sig, step_by_step)
+    def __init__(self, coff, sol, sig):
+        super().__init__(coff, sol, sig)
 
     def apply(self):
-        if self.step_by_step:
-            print("**** Gauss Jordan start ****")
-            print("a = ")
-            print(self.coff)
-            print("b = ")
-            print(self.sol)
-
         self.reducedEchelon()
-
-        if self.step_by_step:
-            print (f"solution = {self.sol}")
-            print("**** Gauss Jordan end ****")
         return self.sol  # Round final results for presentation
 
     def forwardElimination(self):
@@ -43,25 +32,13 @@ class GaussJordan(Method):
                 self.sol[j] = self.sign(self.sol[j] - factor * self.sol[i])           # Round solution
 
     def reducedEchelon(self):
-        if self.step_by_step:
-            print("**** Reduced Echelon Form start ****")
         n = len(self.coff)
         for i in range(n - 1, -1, -1):  # Start from the last row
             # Eliminate all rows above
-            if self.step_by_step:
-                print(f"Eliminate all elements above row {i}")
             for j in range(i - 1, -1, -1):
                 factor = self.coff[j, i]
                 self.coff[j] = self.sign_array(self.coff[j] - factor * self.coff[i])
                 self.sol[j] = self.sign(self.sol[j] - factor * self.sol[i])
-            if self.step_by_step:
-                # print(f"Row {i} is done")
-                print("a = ")
-                print(self.coff)
-                print("b = ")
-                print(self.sol)
-        if self.step_by_step:
-            print("**** Reduced Echelon Form end ****")
     
 sol = np.array([7, 12, 13])
 sol = sol.astype(float)
