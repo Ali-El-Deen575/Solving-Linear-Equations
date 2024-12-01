@@ -30,7 +30,6 @@ class GaussJordan(Method):
                 factor = self.coff[j, i]
                 self.coff[j] = self.sign_array(self.coff[j] - factor * self.coff[i])  # Eliminate and round
                 self.sol[j] = self.sign(self.sol[j] - factor * self.sol[i])           # Round solution
-       
 
     def reducedEchelon(self):
         n = len(self.coff)

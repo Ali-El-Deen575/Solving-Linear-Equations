@@ -1,23 +1,23 @@
 import numpy as np
 import math
 class Equations():
-  
-  def __init__(self,num):
-      self.i=0
-      self.j=0
-      self.sig= 5
-      self.coff = np.zeros((num,num))
-      self.sol = np.zeros(num)
-      self.num =num
-  def setCoff(self,b):
-      if(self.j == self.num):
-         self.sol[self.i] = b
-         self.i +=1
-         self.j = 0
-      else:  
-         self.coff[self.i,self.j] = b
-         self.j += 1  
- 
+
+    def __init__(self,num):
+        self.i=0
+        self.j=0
+        self.sig= 5
+        self.coff = np.zeros((num,num))
+        self.sol = np.zeros(num)
+        self.num =num
+    def setCoff(self,b):
+        if(self.j == self.num):
+            self.sol[self.i] = b
+            self.i +=1
+            self.j = 0
+        else:
+            self.coff[self.i,self.j] = b
+            self.j += 1
+
 class Method():
     def __init__(self,coff,solu,sig):
         self.coff = coff
@@ -39,7 +39,7 @@ class Method():
         self.sol[i],self.sol[row] = self.sol[row],self.sol[i]
     
     
-    def forwardElemination(self,i,j):                 
+    def forwardElemination(self,i,j):
         self.pivoting(i,j)
         pivot = self.coff[i, i]
         if pivot == 0 and self.sol[i] == 0:
@@ -53,15 +53,15 @@ class Method():
             self.sol[k]= self.sign(self.sol[k])
             for l in range(j+1,len(self.coff)):
                 self.coff[k,l] -= m*self.coff[i,l]
-                self.coff[k,l]= self.sign(self.coff[k,l]) 
+                self.coff[k,l]= self.sign(self.coff[k,l])
         if(i == len(self.coff)-1 and j == len(self.coff)-1):
-            return 
-        else:        
+            return
+        else:
             return self.forwardElemination(i+1,j+1)
 
     def backSub(self):
 
-        x = np.zeros(len(self.sol)) 
+        x = np.zeros(len(self.sol))
 
         for k in range(len(self.coff) - 1, -1, -1):
 
@@ -77,7 +77,7 @@ class Method():
         return x
     def forwardSub(self):
 
-        x = np.zeros(len(self.sol)) 
+        x = np.zeros(len(self.sol))
         for k in range(len(self.coff)):
             sum = self.sol[k]
             for l in range(k):
@@ -96,13 +96,4 @@ class Method():
         return rounded
     
     def sign_array(self, array):
-        return np.array([self.sign(val) for val in array]) 
-    
-   
-         
-
-
-
-
- 
-      
+        return np.array([self.sign(val) for val in array])
