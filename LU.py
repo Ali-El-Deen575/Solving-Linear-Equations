@@ -1,4 +1,5 @@
 import numpy as np
+from GaussElemination import GaussElemination
 from Method import Method,Equations
 TOL = 1e-7
 class LU(Method): 
@@ -7,7 +8,7 @@ class LU(Method):
         self.method = method
 
     def apply(self):
-        self.coff = self.sign_array(self.coff)
+        #self.coff = self.sign_array(self.coff)
         if self.method == "Doolittle":
             return self.dooLittle()
         elif self.method == "Crout":
@@ -43,15 +44,16 @@ class LU(Method):
                     for k in range(i):
                         sum += self.sign(lower[j, k] * upper[k, i])
                     if abs(upper[i, i]) < TOL:
-                        raise ZeroDivisionError("Singular Matrix")
+                        raise ValueError("Singular Matrix")
                     lower[j, i] = self.sign((self.coff[j, i] - sum) / upper[i, i])
         
         # Solving using lower
-        temp = self.coff 
-        self.coff = lower
-        self.sol = self.backSub()
-        self.coff = temp
-        return self.sol
+ 
+        outer = GaussElemination(lower,self.sol,self.sig)
+        Y = outer.forwardSub()
+        inner = GaussElemination(upper,Y,self.sig)
+        sol = inner.backSub()
+        return sol
     
     def crout(self):
         if TOL <= 0:
@@ -73,15 +75,15 @@ class LU(Method):
                 for k in range(j):
                     sum += self.sign(lower[j, k] * upper[k, i])
                 if abs(lower[j, j]) < TOL:
-                    raise ZeroDivisionError("Singular Matrix")
+                    raise ValueError("Singular Matrix")
                 upper[j, i] = self.sign((self.coff[j, i] - sum) / lower[j, j])
 
         # Solving using lower
-        temp = self.coff 
-        self.coff = lower
-        self.sol = self.backSub()
-        self.coff = temp
-        return self.sol
+        outer = GaussElemination(lower,self.sol,self.sig)
+        Y = outer.forwardSub()
+        inner = GaussElemination(upper,Y,self.sig)
+        sol = inner.backSub()
+        return sol
     
     def cholesky(self):
         if TOL <= 0:
@@ -107,15 +109,22 @@ class LU(Method):
                     for k in range(j):
                         sum += self.sign(lower[i, k] * lower[j, k])
                     if abs(lower[j, j]) < TOL:
-                        raise ZeroDivisionError("Singular Matrix")
+                        raise ValueError("Singular Matrix")
                     lower[i, j] = self.sign((self.coff[i, j] - sum) / lower[j, j])
 
         # return lower, lower.T
 
         # Solving using lower
-        temp = self.coff 
-        self.coff = lower
-        self.sol = self.backSub()
-        self.coff = temp
-        return self.sol
+        outer = GaussElemination(lower,self.sol,self.sig)
+        Y = outer.forwardSub()
+        inner = GaussElemination(lower.T,Y,self.sig)
+        sol = inner.backSub()
+        return sol
+sol = np.array([7, 12, 13])
+#sol = sol.astype(float)
+coff = np.array([[6, 15, 55],[15, 55, 225],[55, 225, 979]])
+#coff = coff.astype(float)
+jr =LU(coff,sol,"Crout",5)   
+print(jr.apply())
+print(np.linalg.solve(coff,sol))        
 

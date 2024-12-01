@@ -196,17 +196,17 @@
     </property>
     <item>
      <property name="text">
-      <string> Doolittle Form</string>
+      <string>Doolittle</string>
      </property>
     </item>
     <item>
      <property name="text">
-      <string>Crout Form</string>
+      <string>Crout</string>
      </property>
     </item>
     <item>
      <property name="text">
-      <string>Chelosky Form</string>
+      <string>Cholesky</string>
      </property>
     </item>
    </widget>

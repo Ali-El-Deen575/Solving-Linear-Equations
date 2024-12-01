@@ -42,8 +42,10 @@ class Method():
     def forwardElemination(self,i,j):                 
         self.pivoting(i,j)
         pivot = self.coff[i, i]
+        if pivot == 0 and self.sol[i] == 0:
+            raise ValueError("Infinite Number of Solutions")
         if pivot == 0:
-            return False
+            raise ValueError("No Solution (Singular matrix)")
         for k in range (i+1,len(self.coff)):
             m = self.coff[k,j]/self.coff[i,j]
             self.coff[k,j] =0
@@ -53,9 +55,9 @@ class Method():
                 self.coff[k,l] -= m*self.coff[i,l]
                 self.coff[k,l]= self.sign(self.coff[k,l]) 
         if(i == len(self.coff)-1 and j == len(self.coff)-1):
-            return True
+            return 
         else:        
-           return self.forwardElemination(i+1,j+1)
+            return self.forwardElemination(i+1,j+1)
 
     def backSub(self):
 
@@ -70,6 +72,17 @@ class Method():
                 sum -= self.coff[k, l] * x[l]
         
 
+            x[k] =self.sign( sum / self.coff[k, k])
+
+        return x
+    def forwardSub(self):
+
+        x = np.zeros(len(self.sol)) 
+        for k in range(len(self.coff)):
+            sum = self.sol[k]
+            for l in range(k):
+                sum -= self.coff[k, l] * x[l]
+        
             x[k] =self.sign( sum / self.coff[k, k])
 
         return x

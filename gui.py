@@ -7,6 +7,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from GaussElemination import GaussElemination
 from Gaussjordan import GaussJordan
+from LU import LU
 from Jacobi import Jacobi
 from GaussSeidel import GaussSeidel
 from Method import Equations  
@@ -104,32 +105,46 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
         if(self.method.currentText()=="Gauss Elimination"):
             gaussElem = GaussElemination(self.system.coff,self.system.sol,self.system.sig)
             startTime = time.time()
-            if(gaussElem.forwardElemination(0,0)):
+            try:   
+                gaussElem.forwardElemination(0,0)
+            except ValueError as e:
+                self.result.setText(f"{e}")
+            else:         
                 res = gaussElem.apply()
                 EndTime = time.time()
                 for i in range(len(res)):
                     self.result.setText(self.result.toPlainText()+f"X{i+1} = {res[i]}\n")
                 self.time.setText(f"{EndTime - startTime}")    
-            else:
-                self.result.setText("System has No Solution OR infinite Number of Solutions")  
+ 
         
         elif(self.method.currentText()=="Gauss Jordan"):
             gaussJor = GaussJordan(self.system.coff,self.system.sol,self.system.sig)
             startTime = time.time()
-            if(gaussJor.forwardElimination()):
+            try:   
+                gaussJor.forwardElimination()
+            except ValueError as e:
+                self.result.setText(f"{e}")
+            else:         
                 res = gaussJor.apply()
                 EndTime = time.time()
                 for i in range(len(res)):
                     self.result.setText(self.result.toPlainText()+f"X{i+1} = {res[i]}\n")
                 self.time.setText(f"{EndTime - startTime}")    
-            else:
-                self.result.setText("System has No Solution OR infinite Number of Solutions")          
+          
         
-        elif(self.method.currentText()=="LU Decompostion"):
-            gauss = GaussElemination(self.system.coff,self.system.sol,self.system.sig)
-            res = gauss.apply()
-            for i in range(len(res)):
-                self.result.setText(self.result.toPlainText()+f"X{i+1} = {res[i]}\n")
+        elif(self.method.currentText()=="LU decompostion"):
+            method = str(self.Parameters.currentText())
+            lu = LU(self.system.coff,self.system.sol,method,self.system.sig)
+            startTime = time.time()
+            try:
+                res = lu.apply()
+            except ValueError as e:
+                self.result.setText(f"{e}")
+            else:
+                EndTime = time.time()        
+                for i in range(len(res)):
+                    self.result.setText(self.result.toPlainText()+f"X{i+1} = {res[i]}\n")
+                self.time.setText(f"{EndTime - startTime}")       
         
         elif(self.method.currentText()=="Jacobi"):
             guess = self.InitialGuess.text()
