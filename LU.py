@@ -1,13 +1,16 @@
 import numpy as np
+from GaussElemination import GaussElemination
 from Method import Method,Equations
 TOL = 1e-7
+
 class LU(Method): 
     def __init__(self, coff, sol, method, sig, step_by_step):
         super().__init__(coff, sol, sig, step_by_step)
+
         self.method = method
 
     def apply(self):
-        self.coff = self.sign_array(self.coff)
+        #self.coff = self.sign_array(self.coff)
         if self.method == "Doolittle":
             
             return self.dooLittle()
@@ -65,7 +68,7 @@ class LU(Method):
                     for k in range(i):
                         sum += self.sign(lower[j, k] * upper[k, i])
                     if abs(upper[i, i]) < TOL:
-                        raise ZeroDivisionError("Singular Matrix")
+                        raise ValueError("Singular Matrix")
                     lower[j, i] = self.sign((self.coff[j, i] - sum) / upper[i, i])
 
                     if self.step_by_step:
@@ -76,11 +79,13 @@ class LU(Method):
         # Solving using upper
         if self.step_by_step:
             print("Solving using back substitution on upper") 
-        temp = self.coff 
-        self.coff = upper
-        self.sol = self.backSub()
-        self.coff = temp
-        return self.sol
+
+
+        outer = GaussElemination(lower,self.sol,self.sig,self.step_by_step)
+        Y = outer.forwardSub()
+        inner = GaussElemination(upper,Y,self.sig,self.step_by_step)
+        sol = inner.backSub()
+        return sol
     
     def crout(self):
         if self.step_by_step:
@@ -123,7 +128,9 @@ class LU(Method):
                 if self.step_by_step:
                     print(f"product = {sum}")
                 if abs(lower[j, j]) < TOL:
-                    if self.step_by_step:
+
+
+                if self.step_by_step:
                         print(f"product is almost 0 which means it's a singular matrix")
                     raise ZeroDivisionError("Singular Matrix")
                 upper[j, i] = self.sign((self.coff[j, i] - sum) / lower[j, j])
@@ -133,14 +140,14 @@ class LU(Method):
                     print(f"upper = ")
                     print(upper)
 
-        # Solving using upper
         if self.step_by_step:
             print("Solving using back substitution on upper")
-        temp = self.coff 
-        self.coff = upper
-        self.sol = self.backSub()
-        self.coff = temp
-        return self.sol
+            
+        outer = GaussElemination(lower,self.sol,self.sig)
+        Y = outer.forwardSub()
+        inner = GaussElemination(upper,Y,self.sig)
+        sol = inner.backSub()
+        return sol
     
     def cholesky(self):
         if self.step_by_step:
@@ -193,9 +200,11 @@ class LU(Method):
                     for k in range(j):
                         sum += self.sign(lower[i, k] * lower[j, k])
                     if abs(lower[j, j]) < TOL:
+
                         if self.step_by_step:
                             print(f"lower[{j}][{j}] is almost 0 which means it's a singular matrix")
                         raise ZeroDivisionError("Singular Matrix")
+
                     lower[i, j] = self.sign((self.coff[i, j] - sum) / lower[j, j])
 
                     if self.step_by_step:
@@ -209,10 +218,18 @@ class LU(Method):
             print("Solving using back substitution on upper")
 
 
+
         # Solving using upper
-        temp = self.coff 
-        self.coff = lower.T
-        self.sol = self.backSub()
-        self.coff = temp
-        return self.sol
+        outer = GaussElemination(lower,self.sol,self.sig)
+        Y = outer.forwardSub()
+        inner = GaussElemination(lower.T,Y,self.sig)
+        sol = inner.backSub()
+        return sol
+sol = np.array([7, 12, 13])
+#sol = sol.astype(float)
+coff = np.array([[6, 15, 55],[15, 55, 225],[55, 225, 979]])
+#coff = coff.astype(float)
+jr =LU(coff,sol,"Crout",5)
+print(jr.apply())
+print(np.linalg.solve(coff,sol))
 

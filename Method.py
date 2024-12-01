@@ -1,23 +1,23 @@
 import numpy as np
 import math
 class Equations():
-  
-  def __init__(self,num):
-      self.i=0
-      self.j=0
-      self.sig= 5
-      self.coff = np.zeros((num,num))
-      self.sol = np.zeros(num)
-      self.num =num
-  def setCoff(self,b):
-      if(self.j == self.num):
-         self.sol[self.i] = b
-         self.i +=1
-         self.j = 0
-      else:  
-         self.coff[self.i,self.j] = b
-         self.j += 1  
- 
+
+    def __init__(self,num):
+        self.i=0
+        self.j=0
+        self.sig= 5
+        self.coff = np.zeros((num,num))
+        self.sol = np.zeros(num)
+        self.num =num
+    def setCoff(self,b):
+        if(self.j == self.num):
+            self.sol[self.i] = b
+            self.i +=1
+            self.j = 0
+        else:
+            self.coff[self.i,self.j] = b
+            self.j += 1
+
 class Method():
     def __init__(self,coff,solu,sig , step_by_step = False):
         self.coff = coff
@@ -69,13 +69,18 @@ class Method():
             print("b = ")
             print(self.sol)
 
+
         self.pivoting(i,j)
         pivot = self.coff[i, i]
+        if pivot == 0 and self.sol[i] == 0:
+            raise ValueError("Infinite Number of Solutions")
         if pivot == 0:
-            if self.step_by_step:
-                print(f"pivot = 0 :( ")
+
+          if self.step_by_step:
+                print(f"pivot = 0 , No Solution (Singular matrix)")
                 print(f"**** Forward elemination on a{i}{j} end ****")
-            return False
+            raise ValueError("No Solution (Singular matrix)")
+
         for k in range (i+1,len(self.coff)):
             
             m = self.coff[k,j]/self.coff[i,j]
@@ -110,7 +115,7 @@ class Method():
             print("b = ")
             print(self.sol)
 
-        x = np.zeros(len(self.sol)) 
+        x = np.zeros(len(self.sol))
 
         for k in range(len(self.coff) - 1, -1, -1):
 
@@ -130,6 +135,17 @@ class Method():
             print(f"Solution = {x}")
             print("**** Backward Substitution end ****")
         return x
+    def forwardSub(self):
+
+        x = np.zeros(len(self.sol))
+        for k in range(len(self.coff)):
+            sum = self.sol[k]
+            for l in range(k):
+                sum -= self.coff[k, l] * x[l]
+        
+            x[k] =self.sign( sum / self.coff[k, k])
+
+        return x
 
     def sign (self,value):
         if value == 0:
@@ -140,13 +156,4 @@ class Method():
         return rounded
     
     def sign_array(self, array):
-        return np.array([self.sign(val) for val in array]) 
-    
-   
-         
-
-
-
-
- 
-      
+        return np.array([self.sign(val) for val in array])

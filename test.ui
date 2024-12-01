@@ -196,17 +196,17 @@
     </property>
     <item>
      <property name="text">
-      <string> Doolittle Form</string>
+      <string>Doolittle</string>
      </property>
     </item>
     <item>
      <property name="text">
-      <string>Crout Form</string>
+      <string>Crout</string>
      </property>
     </item>
     <item>
      <property name="text">
-      <string>Chelosky Form</string>
+      <string>Cholesky</string>
      </property>
     </item>
    </widget>
@@ -482,6 +482,19 @@
       </widget>
      </widget>
     </widget>
+   </widget>
+   <widget class="QCheckBox" name="ScalingCheckBox">
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>230</y>
+      <width>81</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Scale</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

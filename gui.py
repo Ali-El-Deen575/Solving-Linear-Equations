@@ -7,18 +7,17 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from GaussElemination import GaussElemination
 from Gaussjordan import GaussJordan
+from LU import LU
 from Jacobi import Jacobi
 from GaussSeidel import GaussSeidel
-from Method import Equations  
+from Method import Equations
 from PyQt5.uic import loadUiType
-from os import path 
-import sys 
-        
-mainWindowFileName = "test.ui"                
+from os import path
+import sys
+
+mainWindowFileName = "test.ui"
 FORM_CLASS, _ = loadUiType(path.join(path.dirname(__file__), mainWindowFileName))
-    
-app = QApplication(sys.argv)
-         
+
 
 class Ui_MainWindow(QMainWindow,FORM_CLASS):
     def __init__(self, parent=None):
@@ -26,15 +25,20 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
         QMainWindow.__init__(self)
         self.setupUi(self)
         self.system=Equations(0)
+        self.scaling = False
         self.EnterNo.clicked.connect(self.setNoEqn)
         self.EnterEqn.clicked.connect(self.setEqn)
         self.FindSol.clicked.connect(self.findSol)
         self.Clear.clicked.connect(self.clear)
         self.EnterSigFigures.clicked.connect(self.setSigNo)
         self.method.currentTextChanged.connect(self.parameters)
+        self.ScalingCheckBox.stateChanged.connect(self.toggleScaling)
         self.parameters()
 
-   
+    def toggleScaling(self, state):
+        if state == QtCore.Qt.Checked:
+            self.scaling = True
+
     def parameters (self):
         if(self.method.currentText()=="Gauss Elimination" or self.method.currentText()=="Gauss Jordan") :
             self.ParametersLabel.setEnabled(False)
@@ -56,7 +60,7 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
             self.IterationLabel.setEnabled(False)
             self.StoppingConditionLabel.setEnabled(False)
 
-  
+
         elif(self.method.currentText()=="Jacobi" or self.method.currentText()=="Gauss sidel") :
             self.ParametersLabel.setEnabled(False)
             self.Parameters.setEnabled(False)
@@ -71,20 +75,20 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
 
     def is_number(self,s):
         try:
-          float(s)
-          return True
+            float(s)
+            return True
         except ValueError:
-          return False
-    def setNoEqn (self): 
-      if(self.isWholeNumber(self.NoEqn.text())) :      
-        eqnNo = int(self.NoEqn.text())
-        self.No.setText("n= "+str(eqnNo)) 
-        self.var.setText("a11 = ")
-        self.system =Equations(eqnNo)
-    def setSigNo (self): 
-      if(self.isWholeNumber(self.SigFigures.text())) :      
-        SigNo = int(self.SigFigures.text())
-        self.system.sig = SigNo    
+            return False
+    def setNoEqn (self):
+        if(self.isWholeNumber(self.NoEqn.text())) :
+            eqnNo = int(self.NoEqn.text())
+            self.No.setText("n= "+str(eqnNo))
+            self.var.setText("a11 = ")
+            self.system =Equations(eqnNo)
+    def setSigNo (self):
+        if(self.isWholeNumber(self.SigFigures.text())) :
+            SigNo = int(self.SigFigures.text())
+            self.system.sig = SigNo
     
     def setEqn(self):
         if(self.is_number(self.Eqn.text())) :
@@ -94,48 +98,65 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                 if(self.system.j < self.system.num and self.system.i < self.system.num):
                     self.var.setText(("a"+str(self.system.i+1)+str(self.system.j+1)+" ="))
                     
-                elif(self.system.i < self.system.num) :               
+                elif(self.system.i < self.system.num) :
                     self.var.setText("b"+str(self.system.i+1)+" =")
                     
                 else:
                     self.var.setText("")
 
     def findSol(self):
+        if self.scaling:
+            self.system.coff, self.system.sol = self.scale_matrix(self.system.coff,self.system.sol)
+
+        print(self.system.coff)
+        print(self.system.sol)
         if(self.method.currentText()=="Gauss Elimination"):
             gaussElem = GaussElemination(self.system.coff,self.system.sol,self.system.sig)
             startTime = time.time()
-            if(gaussElem.forwardElemination(0,0)):
+            try:
+                gaussElem.forwardElemination(0,0)
+            except ValueError as e:
+                self.result.setText(f"{e}")
+            else:
                 res = gaussElem.apply()
                 EndTime = time.time()
                 for i in range(len(res)):
                     self.result.setText(self.result.toPlainText()+f"X{i+1} = {res[i]}\n")
-                self.time.setText(f"{EndTime - startTime}")    
-            else:
-                self.result.setText("System has No Solution OR infinite Number of Solutions")  
+                self.time.setText(f"{EndTime - startTime}")
+
         
         elif(self.method.currentText()=="Gauss Jordan"):
             gaussJor = GaussJordan(self.system.coff,self.system.sol,self.system.sig)
             startTime = time.time()
-            if(gaussJor.forwardElimination()):
+            try:
+                gaussJor.forwardElimination()
+            except ValueError as e:
+                self.result.setText(f"{e}")
+            else:
                 res = gaussJor.apply()
                 EndTime = time.time()
                 for i in range(len(res)):
                     self.result.setText(self.result.toPlainText()+f"X{i+1} = {res[i]}\n")
-                self.time.setText(f"{EndTime - startTime}")    
+                self.time.setText(f"{EndTime - startTime}")
+
+        elif(self.method.currentText()=="LU decompostion"):
+            lu = LU(self.system.coff,self.system.sol,self.Parameters.currentText(),self.system.sig)
+            startTime = time.time()
+            try:
+                res = lu.apply()
+            except ValueError as e:
+                self.result.setText(f"{e}")
             else:
-                self.result.setText("System has No Solution OR infinite Number of Solutions")          
-        
-        elif(self.method.currentText()=="LU Decompostion"):
-            gauss = GaussElemination(self.system.coff,self.system.sol,self.system.sig)
-            res = gauss.apply()
-            for i in range(len(res)):
-                self.result.setText(self.result.toPlainText()+f"X{i+1} = {res[i]}\n")
+                EndTime = time.time()
+                for i in range(len(res)):
+                    self.result.setText(self.result.toPlainText()+f"X{i+1} = {res[i]}\n")
+                self.time.setText(f"{EndTime - startTime}")
         
         elif(self.method.currentText()=="Jacobi"):
             guess = self.InitialGuess.text()
-            Guess = None if guess == "" else self.extractNumbers(guess) 
+            Guess = None if guess == "" else self.extractNumbers(guess)
             iterations =self.IterationNumber.text()
-            error = self.StoppingCondition.text()           
+            error = self.StoppingCondition.text()
             if not(iterations == "" and error == ""):
                 if(self.isWholeNumber(iterations) or iterations == "") and (self.is_number(error) or error == ""):
                     if(Guess is None or (all(isinstance(x, (int, float)) for x in Guess) and len(Guess) == len(self.system.sol))):
@@ -148,13 +169,13 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                         for i in range(len(res)):
                             self.result.setText(self.result.toPlainText()+f"X{i+1} = {res[i]}\n")
                         self.time.setText(f"{EndTime - startTime}")
-                        self.Iterations.setText(f"{it}")     
+                        self.Iterations.setText(f"{it}")
         
         elif(self.method.currentText()=="Gauss sidel"):
             guess = self.InitialGuess.text()
-            Guess = None if guess == "" else self.extractNumbers(guess) 
+            Guess = None if guess == "" else self.extractNumbers(guess)
             iterations =self.IterationNumber.text()
-            error = self.StoppingCondition.text()           
+            error = self.StoppingCondition.text()
             if not(iterations == "" and error == ""):
                 if(self.isWholeNumber(iterations) or iterations == "") and (self.is_number(error) or error == ""):
                     if(Guess is None or (all(isinstance(x, (int, float)) for x in Guess) and len(Guess) == len(self.system.sol))):
@@ -167,7 +188,16 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                         for i in range(len(res)):
                             self.result.setText(self.result.toPlainText()+f"X{i+1} = {res[i]}\n")
                         self.time.setText(f"{EndTime - startTime}")
-                        self.Iterations.setText(f"{it}")                               
+                        self.Iterations.setText(f"{it}")
+
+    def scale_matrix(self, A, B):
+        n = A.shape[0]
+        for i in range(n):
+            row_max = max(abs(A[i, j]) for j in range(n))
+            if row_max != 0:
+                A[i, :] = A[i, :] / row_max
+                B[i] = B[i] / row_max
+        return A, B
 
     def clear(self):
         self.system=Equations(0)
@@ -186,8 +216,8 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
     
     def isWholeNumber(self, s):
         try:
-            number = float(s)  
-            if number % 1 == 0: 
+            number = float(s)
+            if number % 1 == 0:
                 return True
             else:
                 return False
@@ -196,16 +226,24 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
     def extractNumbers(self, s):
         try:
             numbers = s.split(',')
-            numbers = [float(num) for num in numbers]           
+            numbers = [float(num) for num in numbers]
             return numbers
         except ValueError:
-            return [] 
-    
-                                
-            
+            return []
 
-def main():   
-    window = Ui_MainWindow() 
+def loadStylesheet():
+    try:
+        with open("StyleSheet.qss", "r") as file:
+            stylesheet = file.read()
+            QApplication.instance().setStyleSheet(stylesheet)
+    except FileNotFoundError:
+        print("Stylesheet file not found.")
+
+
+def main():
+    app = QApplication(sys.argv)
+    loadStylesheet()
+    window = Ui_MainWindow()
     window.show()
     app.exec_()
 

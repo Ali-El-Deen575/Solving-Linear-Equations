@@ -27,8 +27,10 @@ class GaussJordan(Method):
         for i in range(n):
             self.pivoting(i, i)  # Ensure pivoting for numerical stability
             pivot = self.coff[i, i]
+            if pivot == 0 and self.sol[i] == 0:
+                raise ValueError("Infinite Number of Solutions")
             if pivot == 0:
-                return False
+                raise ValueError("No Solution (Singular matrix)")
 
             # Normalize pivot row
             self.coff[i] = self.sign_array(self.coff[i] / pivot)  # Normalize and round
@@ -39,7 +41,6 @@ class GaussJordan(Method):
                 factor = self.coff[j, i]
                 self.coff[j] = self.sign_array(self.coff[j] - factor * self.coff[i])  # Eliminate and round
                 self.sol[j] = self.sign(self.sol[j] - factor * self.sol[i])           # Round solution
-        return True        
 
     def reducedEchelon(self):
         if self.step_by_step:
@@ -62,10 +63,9 @@ class GaussJordan(Method):
         if self.step_by_step:
             print("**** Reduced Echelon Form end ****")
     
-               
 sol = np.array([7, 12, 13])
 sol = sol.astype(float)
 coff = np.array([[3, 2, -1],[1, 3, 2],[2, -1, 4]])
 coff = coff.astype(float)
-jr =GaussJordan(coff,sol,7)   
-print(jr.apply())                 
+jr =GaussJordan(coff,sol,7)
+print(jr.apply())

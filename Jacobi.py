@@ -5,6 +5,7 @@ import math
 class Jacobi(Method):
     def __init__(self,coff,sol,guess,iter,tol,sig, step_by_step):
         super().__init__(coff, sol, sig, step_by_step) 
+
         if guess is not None:
             self.guess=np.array(guess, dtype=float)
         else:
@@ -33,6 +34,7 @@ class Jacobi(Method):
             for z in range(self.iter):            
                 if self.step_by_step:
                     print(f"* Iteration {z+1} *")   
+
                 y=np.zeros_like(x)
                 for i in range(self.n):
 
@@ -72,6 +74,7 @@ class Jacobi(Method):
                     s = self.sign(s)
                     y[i]=(self.sol[i]-s)/self.coff[i,i]
                     y[i] = self.sign(y[i])
+                    
                     if self.step_by_step:
                         print(f"y{i+1} = {y[i]}")
                 if self.step_by_step:
@@ -81,6 +84,7 @@ class Jacobi(Method):
             if self.step_by_step:
                 print("**** Jacobi end ****")
             
+
             return x , self.iter
         
         else :
@@ -119,10 +123,8 @@ class Jacobi(Method):
             return x , iteration
 
 
-    
-       
 sol = np.array([7, 5])
 coff = np.array([[3, 2],[1, 3]])
 guess = np.array([0,0])
-jacobi =Jacobi(coff,sol,guess,iter=3,tol=None,sig=5)   
-print(jacobi.apply()) 
+jacobi =Jacobi(coff,sol,guess,iter=3,tol=None,sig=5)
+print(jacobi.apply())
