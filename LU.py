@@ -129,10 +129,10 @@ class LU(Method):
                     print(f"product = {sum}")
                 if abs(lower[j, j]) < TOL:
 
-
-                if self.step_by_step:
+                    if self.step_by_step:
                         print(f"product is almost 0 which means it's a singular matrix")
                     raise ZeroDivisionError("Singular Matrix")
+                
                 upper[j, i] = self.sign((self.coff[j, i] - sum) / lower[j, j])
 
                 if self.step_by_step:

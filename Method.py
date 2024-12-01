@@ -76,7 +76,7 @@ class Method():
             raise ValueError("Infinite Number of Solutions")
         if pivot == 0:
 
-          if self.step_by_step:
+            if self.step_by_step:
                 print(f"pivot = 0 , No Solution (Singular matrix)")
                 print(f"**** Forward elemination on a{i}{j} end ****")
             raise ValueError("No Solution (Singular matrix)")
