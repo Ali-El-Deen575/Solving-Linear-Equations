@@ -144,11 +144,13 @@ class LU(Method):
         inner = GaussElemination(lower.T,Y,self.sig)
         sol = inner.backSub()
         return sol
-sol = np.array([7, 12, 13])
-#sol = sol.astype(float)
-coff = np.array([[6, 15, 55],[15, 55, 225],[55, 225, 979]])
-#coff = coff.astype(float)
-jr =LU(coff,sol,"Crout")
-print(jr.apply())
-print(np.linalg.solve(coff,sol))
+
+if __name__ == "__main__":
+    sol = np.array([7, 12, 13])
+    #sol = sol.astype(float)
+    coff = np.array([[6, 15, 55],[15, 55, 225],[55, 225, 979]])
+    #coff = coff.astype(float)
+    jr =LU(coff,sol,"Crout")
+    print(jr.apply())
+    print(np.linalg.solve(coff,sol))
 

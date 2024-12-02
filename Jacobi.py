@@ -60,9 +60,9 @@ class Jacobi(Method):
                 x = y
             return x , iteration
 
-
-sol = np.array([7, 5])
-coff = np.array([[3, 2],[1, 3]])
-guess = np.array([0,0])
-jacobi =Jacobi(coff,sol,guess,iter=3,tol=None,sig=5)
-print(jacobi.apply())
+if __name__ == "__main__":
+    sol = np.array([7, 5])
+    coff = np.array([[3, 2],[1, 3]])
+    guess = np.array([0,0])
+    jacobi =Jacobi(coff,sol,guess,iter=3,tol=None,sig=5)
+    print(jacobi.apply())
