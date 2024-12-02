@@ -26,8 +26,16 @@ class LU(Method):
         n = len(self.coff)
         lower = np.zeros((n, n))
         upper = np.zeros((n, n))
+        P = np.eye(n)
 
         for i in range(n):
+            # Partial Pivoting
+            max_index = np.argmax(abs(self.coff[i:, i])) + i
+            if i != max_index:
+                self.coff[[i, max_index]] = self.coff[[max_index, i]]
+                P[[i, max_index]] = P[[max_index, i]]
+                self.sol[[i, max_index]] = self.sol[[max_index, i]]
+
             # Upper Triangular
             for j in range(i, n):
                 sum = 0
@@ -62,8 +70,16 @@ class LU(Method):
         n = len(self.coff)
         lower = np.zeros((n, n))
         upper = np.eye(n)
+        P = np.eye(n)
 
         for j in range(n):
+            # Partial Pivoting
+            max_index = np.argmax(abs(self.coff[j:, j])) + j
+            if j != max_index:
+                self.coff[[j, max_index]] = self.coff[[max_index, j]]
+                P[[j, max_index]] = P[[max_index, j]]
+                self.sol[[j, max_index]] = self.sol[[max_index, j]]
+
             for i in range(j, n):
                 sum = 0
                 for k in range(j):
@@ -94,8 +110,16 @@ class LU(Method):
             raise ValueError("Input matrix must be symmetric")
         
         lower = np.zeros((n, n))
+        P = np.eye(n)
 
         for i in range(n):
+            # Partial Pivoting
+            max_index = np.argmax(abs(self.coff[i:, i])) + i
+            if i != max_index:
+                self.coff[[i, max_index]] = self.coff[[max_index, i]]
+                P[[i, max_index]] = P[[max_index, i]]
+                self.sol[[i, max_index]] = self.sol[[max_index, i]]
+
             for j in range(i + 1):
                 sum = 0
                 if j == i:  # Diagonal elements
@@ -124,7 +148,7 @@ sol = np.array([7, 12, 13])
 #sol = sol.astype(float)
 coff = np.array([[6, 15, 55],[15, 55, 225],[55, 225, 979]])
 #coff = coff.astype(float)
-jr =LU(coff,sol,"Crout",5)
+jr =LU(coff,sol,"Cholesky",5)
 print(jr.apply())
 print(np.linalg.solve(coff,sol))
 
