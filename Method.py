@@ -19,7 +19,7 @@ class Equations():
             self.j += 1
 
 class Method():
-    def __init__(self,coff,solu,sig):
+    def __init__(self,coff,solu,sig=5):
         self.coff = coff
         self.sol =  solu
         self.sig = sig

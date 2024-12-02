@@ -3,7 +3,7 @@ from Method import Method
 import math
 
 class Jacobi(Method):
-    def __init__(self,coff,sol,guess,iter,tol,sig):
+    def __init__(self,coff,sol,guess,iter,tol,sig=5):
         super().__init__(coff, sol, sig)
         if guess is not None:
             self.guess=np.array(guess, dtype=float)

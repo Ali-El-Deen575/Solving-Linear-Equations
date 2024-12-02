@@ -3,7 +3,7 @@ from GaussElemination import GaussElemination
 from Method import Method,Equations
 TOL = 1e-7
 class LU(Method):
-    def __init__(self, coff, sol, method, sig):
+    def __init__(self, coff, sol, method, sig=5):
         super().__init__(coff, sol, sig)
         self.method = method
 
@@ -148,7 +148,7 @@ sol = np.array([7, 12, 13])
 #sol = sol.astype(float)
 coff = np.array([[6, 15, 55],[15, 55, 225],[55, 225, 979]])
 #coff = coff.astype(float)
-jr =LU(coff,sol,"Cholesky",5)
+jr =LU(coff,sol,"Crout")
 print(jr.apply())
 print(np.linalg.solve(coff,sol))
 

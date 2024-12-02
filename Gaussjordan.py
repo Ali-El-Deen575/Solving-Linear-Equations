@@ -4,7 +4,7 @@ from Method import Method, Equations
 import numpy as np
 
 class GaussJordan(Method):
-    def __init__(self, coff, sol, sig):
+    def __init__(self, coff, sol, sig=5):
         super().__init__(coff, sol, sig)
 
     def apply(self):
