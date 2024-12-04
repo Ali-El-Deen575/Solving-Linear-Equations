@@ -68,6 +68,15 @@ class LU(Method):
         return sol
     
     def crout(self):
+        if self.step_by_step:
+            print("**** Crout start ****")
+            print("a = ")
+            print(self.coff)
+            print("b = ")
+            print(self.sol)
+
+        if TOL <= 0:
+            raise ValueError("Tolerance must be a positive number")
         
         n = len(self.coff)
         lower = np.zeros((n, n))
@@ -81,8 +90,16 @@ class LU(Method):
             print(upper)
 
         for j in range(n):
+            # Partial Pivoting
+            max_index = np.argmax(abs(self.coff[j:, j])) + j
+            if j != max_index:
+                if self.step_by_step:
+                    print(f"Applying partial pivoting at row {i}")
+                self.coff[[j, max_index]] = self.coff[[max_index, j]]
+                P[[j, max_index]] = P[[max_index, j]]
+                self.sol[[j, max_index]] = self.sol[[max_index, j]]
 
-            if self.step_by_step:
+                if self.step_by_step:
                     print("a = ")
                     print(self.coff)
                     print("b = ")
@@ -115,9 +132,16 @@ class LU(Method):
                 
                 upper[j, i] = self.sign((self.coff[j, i] - sum) / lower[j, j])
 
-        # Solving using lower
-        print(upper)
-        print(lower)
+                if self.step_by_step:
+                    print(f"upper[{j}][{i}] = {upper[j][i]}")
+                    print(f"upper = ")
+                    print(upper)
+
+        # Solving 
+        if self.step_by_step:
+            print("Solving using lower and upper :")
+            print("Applying gauss elimination then forward sub. on lower to get Y")
+
         outer = GaussElemination(lower,self.sol,self.sig)
         Y = outer.forwardSub()
 
@@ -160,7 +184,21 @@ class LU(Method):
             print(lower)
 
         for i in range(n):
-    
+            # Partial Pivoting
+            max_index = np.argmax(abs(self.coff[i:, i])) + i
+            if i != max_index:
+                if self.step_by_step:
+                    print(f"Applying partial pivoting at row {i}")
+                self.coff[[i, max_index]] = self.coff[[max_index, i]]
+                P[[i, max_index]] = P[[max_index, i]]
+                self.sol[[i, max_index]] = self.sol[[max_index, i]]
+
+                if self.step_by_step:
+                    print("a = ")
+                    print(self.coff)
+                    print("b = ")
+                    print(self.sol)
+
             for j in range(i + 1):
                 sum = 0
                 if j == i:  # Diagonal elements
@@ -223,5 +261,12 @@ class LU(Method):
             
         return sol
 
-
+if __name__ == "__main__":
+    sol = np.array([7, 12, 13])
+    #sol = sol.astype(float)
+    coff = np.array([[6, 15, 55],[15, 55, 225],[55, 225, 979]])
+    #coff = coff.astype(float)
+    jr =LU(coff,sol,"Crout")
+    print(jr.apply())
+    print(np.linalg.solve(coff,sol))
 
