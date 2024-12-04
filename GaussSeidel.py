@@ -11,10 +11,7 @@ class GaussSeidel(Method):
         self.iter=iter
         self.tol=tol
         self.n=len(sol)
-        for i in range(self.n):
-            row_sum = sum(abs(self.coff[i][j]) for j in range(self.n) if j != i)
-            if abs(self.coff[i][i]) < row_sum:
-                raise ValueError(f"Matrix is not diagonally dominant at row {i}")
+       
 
     def apply(self):
         if self.guess is not None:
@@ -55,12 +52,8 @@ class GaussSeidel(Method):
                     x[i]=(self.sol[i]-s1-s2)/self.coff[i,i]
                     x[i] =self.sign(x[i])
                 if np.linalg.norm(np.dot(self.coff,x)-self.sol,np.inf) < (self.tol*max(1.0,np.linalg.norm(x,np.inf))):
+                    return x , iteration
+                if iteration > 100:
                     break
             return x , iteration
 
-if __name__ == "__main__":
-    sol = np.array([7, 12, 13])
-    coff = np.array([[3, 2, -1],[1, 3, 2],[2, -1, 4]])
-    guess = np.array([0,0,0])
-    seidel =GaussSeidel(coff,sol,guess,iter=None,tol=5e-2,sig =3)
-    print(seidel.apply())

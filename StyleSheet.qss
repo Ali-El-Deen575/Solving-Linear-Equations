@@ -76,7 +76,7 @@ QTextEdit {
     font-size: 18px;
 }
 QTextEdit#view {
-    font-size: 10px;
+    font-size: 12px;
 }
 
 /* Scroll Area */

@@ -36,6 +36,7 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
         self.method.currentTextChanged.connect(self.parameters)
         self.ScalingCheckBox.stateChanged.connect(self.toggleScaling)
         self.parameters()
+    
 
     def toggleScaling(self, state):
         if state == QtCore.Qt.Checked:
@@ -93,7 +94,20 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
         self.system.sig = SigNo    
     
     def setEqn(self):
-        if(self.is_number(self.Eqn.text())) :
+        if(self.Eqn.text()=="") :
+            if(self.system.i<self.system.num):
+                self.system.setCoff(0)
+                self.Eqn.setText("")
+                if(self.system.j < self.system.num and self.system.i < self.system.num):
+                    self.var.setText(("a"+str(self.system.i+1)+str(self.system.j+1)+" ="))
+                    
+                elif(self.system.i < self.system.num) :               
+                    self.var.setText("b"+str(self.system.i+1)+" =")
+                    
+                else:
+                    self.var.setText("")
+
+        elif(self.is_number(self.Eqn.text())) :
             if(self.system.i<self.system.num):
                 self.system.setCoff(float(self.Eqn.text()))
                 self.Eqn.setText("")
@@ -159,6 +173,10 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
             self.result.setText("")
             self.view.setText(self.showEquations())
             try:
+                lu.forwardElemination(0,0)
+                A = np.array(self.system.coff)
+                B = np.array(self.system.sol)
+                lu = LU(A,B,method,self.system.sig)
                 res = lu.apply()
             except ValueError as e:
                 self.result.setText(f"{e}")
@@ -247,6 +265,7 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
         self.Iterations.setText("")
         self.SigFigures.setText("")
         self.result.setText("")
+        self.view.setText("")
     
     def isWholeNumber(self, s):
         try:

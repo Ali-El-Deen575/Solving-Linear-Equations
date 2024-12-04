@@ -49,6 +49,9 @@
       <height>22</height>
      </rect>
     </property>
+    <property name="focusPolicy">
+     <enum>Qt::StrongFocus</enum>
+    </property>
     <property name="placeholderText">
      <string>Enter Coefficients</string>
     </property>
@@ -64,6 +67,9 @@
     </property>
     <property name="text">
      <string>Enter</string>
+    </property>
+    <property name="shortcut">
+     <string>Return</string>
     </property>
    </widget>
    <widget class="QComboBox" name="method">
@@ -213,14 +219,14 @@
    <widget class="QLineEdit" name="SigFigures">
     <property name="geometry">
      <rect>
-      <x>60</x>
+      <x>120</x>
       <y>180</y>
-      <width>291</width>
+      <width>231</width>
       <height>22</height>
      </rect>
     </property>
     <property name="placeholderText">
-     <string>Enter Number of Siginificant Figures (default : 5)</string>
+     <string>(default : 5)</string>
     </property>
    </widget>
    <widget class="QPushButton" name="EnterSigFigures">
@@ -333,7 +339,7 @@
       <x>70</x>
       <y>280</y>
       <width>271</width>
-      <height>261</height>
+      <height>251</height>
      </rect>
     </property>
     <property name="title">
@@ -494,6 +500,19 @@
     </property>
     <property name="text">
      <string>Scale</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>180</y>
+      <width>111</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Siginificant figures</string>
     </property>
    </widget>
   </widget>

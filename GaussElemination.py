@@ -7,10 +7,4 @@ class GaussElemination(Method):
     def apply(self):
         return self.backSub()
 
-if __name__ == "__main__":
-    sol = np.array([7, 12, 13])
-    sol = sol.astype(float)
-    coff = np.array([[3, 2, -1],[1, 3, 2],[2, -1, 4]])
-    coff = coff.astype(float)
-    jr =GaussElemination(coff,sol,4)
-    print(jr.apply())
+
