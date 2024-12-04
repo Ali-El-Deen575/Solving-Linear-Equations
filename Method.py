@@ -20,8 +20,9 @@ class Equations():
 
 class Method():
     def __init__(self,coff,solu,sig=5 , step_by_step = False):
-        self.coff = coff
-        self.sol =  solu
+        # self.coff = coff
+        self.coff = np.array(coff, dtype=float)
+        self.sol =  np.array(solu , dtype=float)
         self.sig = sig
         self.step_by_step = step_by_step
 
@@ -79,20 +80,30 @@ class Method():
             raise ValueError("No Solution (Singular matrix)")
         
         for k in range (i+1,len(self.coff)):
-            m = self.coff[k,j]/self.coff[i,j]
+            m = self.sign(self.coff[k,j]/self.coff[i,j])
             self.coff[k,j] =0
             self.sol[k] -= m*self.sol[i]
             self.sol[k]= self.sign(self.sol[k])
+
+            if self.step_by_step:
+                print(f"m = {m}")
+                print(f"b{k} = b{k} - m*b{i} = {self.sol[k]}")
+                
+
             for l in range(j+1,len(self.coff)):
                 self.coff[k,l] -= m*self.coff[i,l]
                 self.coff[k,l]= self.sign(self.coff[k,l])
+                
+                if self.step_by_step:
+                    print(f"a{k}{l} = a{k}{l} - m*a{i}{l} = {self.coff[k,l]}")
+                    
             
-            if self.step_by_step:
-                print(f"after forward elemination on a{i}{j} with m = {m}")
-                print("a = ")
-                print(self.coff)
-                print("b = ")
-                print(self.sol)
+        if self.step_by_step:
+            print(f"after forward elemination on a{i}{j}")
+            print("a = ")
+            print(self.coff)
+            print("b = ")
+            print(self.sol)
 
         if(i == len(self.coff)-1 and j == len(self.coff)-1):
             if self.step_by_step:
