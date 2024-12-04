@@ -34,11 +34,17 @@ class GaussJordan(Method):
     def reducedEchelon(self):
         n = len(self.coff)
         for i in range(n - 1, -1, -1):  # Start from the last row
+            # Normalize the pivot row
+            pivot = self.coff[i, i]
+            if pivot != 0:
+                self.coff[i] = self.sign_array(self.coff[i] / pivot)  # Normalize and round
+                self.sol[i] = self.sign(self.sol[i] / pivot)          # Round solution
+
             # Eliminate all rows above
             for j in range(i - 1, -1, -1):
                 factor = self.coff[j, i]
-                self.coff[j] = self.sign_array(self.coff[j] - factor * self.coff[i])
-                self.sol[j] = self.sign(self.sol[j] - factor * self.sol[i])
+                self.coff[j] = self.sign_array(self.coff[j] - factor * self.coff[i])  # Eliminate and round
+                self.sol[j] = self.sign(self.sol[j] - factor * self.sol[i])           # Round solution
 
 if __name__ == "__main__":
     sol = np.array([7, 12, 13])
