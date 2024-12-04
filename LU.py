@@ -22,7 +22,7 @@ class LU(Method):
     def dooLittle(self):
         if TOL <= 0:
             raise ValueError("Tolerance must be a positive number")
-        
+          
         n = len(self.coff)
         lower = np.zeros((n, n))
         upper = np.zeros((n, n))
