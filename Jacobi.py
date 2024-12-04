@@ -46,8 +46,8 @@ class Jacobi(Method):
                     y[i]=(self.sol[i]-s)/self.coff[i,i]
                     y[i] = self.sign(y[i])
 
-                    if self.step_by_step:
-                        print(f"y{i+1} = {y[i]}")
+                    # if self.step_by_step:
+                        # print(f"y{i+1} = {y[i]}")
                 if self.step_by_step:
                     print(f"y = {y}")
 
@@ -123,7 +123,7 @@ class Jacobi(Method):
                     print(f"didn't converge enough, we have to carry on.")
 
                 x = y
-                
+
             return x , iteration
 
 if __name__ == "__main__":
