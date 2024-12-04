@@ -68,88 +68,41 @@ class LU(Method):
         return sol
     
     def crout(self):
-        if self.step_by_step:
-            print("**** Crout start ****")
-            print("a = ")
-            print(self.coff)
-            print("b = ")
-            print(self.sol)
+        A = self.coff
+        tol = TOL
 
-        if TOL <= 0:
-            raise ValueError("Tolerance must be a positive number")
-        
-        n = len(self.coff)
-        lower = np.zeros((n, n))
-        upper = np.eye(n)
+        n = len(A)
+        L = np.zeros((n, n))
+        U = np.eye(n)
         P = np.eye(n)
 
-        if self.step_by_step:
-            print("Lower = ")
-            print(lower)
-            print("Upper = ")
-            print(upper)
-
         for j in range(n):
-            # Partial Pivoting
-            max_index = np.argmax(abs(self.coff[j:, j])) + j
-            if j != max_index:
-                if self.step_by_step:
-                    print(f"Applying partial pivoting at row {i}")
-                self.coff[[j, max_index]] = self.coff[[max_index, j]]
+            # Pivoting
+            max_index = np.argmax(abs(A[j:, j])) + j
+            if abs(A[max_index, j]) < tol:
+                raise ValueError("Matrix is singular or nearly singular")
+            if max_index != j:
+                A[[j, max_index]] = A[[max_index, j]]
                 P[[j, max_index]] = P[[max_index, j]]
-                self.sol[[j, max_index]] = self.sol[[max_index, j]]
-
-                if self.step_by_step:
-                    print("a = ")
-                    print(self.coff)
-                    print("b = ")
-                    print(self.sol)
 
             for i in range(j, n):
-                sum = 0
-                for k in range(j):
-                    sum += self.sign(lower[i, k] * upper[k, j])
-                lower[i, j] = self.sign(self.coff[i, j] - sum)
-
-                if self.step_by_step:
-                    print(f"lower[{i}][{j}] = {lower[i][j]}")
-                    print(f"lower = ")
-                    print(lower)
-
+                L[i, j] = A[i, j] - sum(L[i, k] * U[k, j] for k in range(j))
             for i in range(j + 1, n):
-                sum = 0
-                for k in range(j):
-                    sum += self.sign(lower[j, k] * upper[k, i])
-                
-                if self.step_by_step:
-                    print(f"product = {sum}")
+                U[j, i] = (A[j, i] - sum(L[j, k] * U[k, i] for k in range(j))) / L[j, j]
 
-                if abs(lower[j, j]) < TOL:
-                    if self.step_by_step:
-                        print(f"product is almost 0 which means it's a singular matrix")
-
-                    raise ZeroDivisionError("Singular Matrix")
-                
-                upper[j, i] = self.sign((self.coff[j, i] - sum) / lower[j, j])
-
-                if self.step_by_step:
-                    print(f"upper[{j}][{i}] = {upper[j][i]}")
-                    print(f"upper = ")
-                    print(upper)
-
-        # Solving 
+            # Solving 
         if self.step_by_step:
             print("Solving using lower and upper :")
             print("Applying gauss elimination then forward sub. on lower to get Y")
 
-        outer = GaussElemination(lower,self.sol,self.sig)
+        outer = GaussElemination(L,self.sol,self.sig)
         Y = outer.forwardSub()
 
         if self.step_by_step:
             print(f"Y = {Y}")
             print("Applying gauss elimination then back sub. on upper to get solution")
 
-        inner = GaussElemination(upper,Y,self.sig)
+        inner = GaussElemination(U,Y,self.sig)
         sol = inner.backSub()
 
         if self.step_by_step:
@@ -157,6 +110,97 @@ class LU(Method):
             print("**** Crout end ****")
 
         return sol
+
+    # def crout(self):
+    #     if self.step_by_step:
+    #         print("**** Crout start ****")
+    #         print("a = ")
+    #         print(self.coff)
+    #         print("b = ")
+    #         print(self.sol)
+
+    #     if TOL <= 0:
+    #         raise ValueError("Tolerance must be a positive number")
+        
+    #     n = len(self.coff)
+    #     lower = np.zeros((n, n))
+    #     upper = np.eye(n)
+    #     P = np.eye(n)
+
+    #     if self.step_by_step:
+    #         print("Lower = ")
+    #         print(lower)
+    #         print("Upper = ")
+    #         print(upper)
+
+    #     for j in range(n):
+    #         # Partial Pivoting
+    #         max_index = np.argmax(abs(self.coff[j:, j])) + j
+    #         if j != max_index:
+    #             if self.step_by_step:
+    #                 print(f"Applying partial pivoting at row {i}")
+    #             self.coff[[j, max_index]] = self.coff[[max_index, j]]
+    #             P[[j, max_index]] = P[[max_index, j]]
+    #             self.sol[[j, max_index]] = self.sol[[max_index, j]]
+
+    #             if self.step_by_step:
+    #                 print("a = ")
+    #                 print(self.coff)
+    #                 print("b = ")
+    #                 print(self.sol)
+
+    #         for i in range(j, n):
+    #             sum = 0
+    #             for k in range(j):
+    #                 sum += self.sign(lower[i, k] * upper[k, j])
+    #             lower[i, j] = self.sign(self.coff[i, j] - sum)
+
+    #             if self.step_by_step:
+    #                 print(f"lower[{i}][{j}] = {lower[i][j]}")
+    #                 print(f"lower = ")
+    #                 print(lower)
+
+    #         for i in range(j + 1, n):
+    #             sum = 0
+    #             for k in range(j):
+    #                 sum += self.sign(lower[j, k] * upper[k, i])
+                
+    #             if self.step_by_step:
+    #                 print(f"product = {sum}")
+
+    #             if abs(lower[j, j]) < TOL:
+    #                 if self.step_by_step:
+    #                     print(f"product is almost 0 which means it's a singular matrix")
+
+    #                 raise ZeroDivisionError("Singular Matrix")
+                
+    #             upper[j, i] = self.sign((self.coff[j, i] - sum) / lower[j, j])
+
+    #             if self.step_by_step:
+    #                 print(f"upper[{j}][{i}] = {upper[j][i]}")
+    #                 print(f"upper = ")
+    #                 print(upper)
+
+    #     # Solving 
+    #     if self.step_by_step:
+    #         print("Solving using lower and upper :")
+    #         print("Applying gauss elimination then forward sub. on lower to get Y")
+
+    #     outer = GaussElemination(lower,self.sol,self.sig)
+    #     Y = outer.forwardSub()
+
+    #     if self.step_by_step:
+    #         print(f"Y = {Y}")
+    #         print("Applying gauss elimination then back sub. on upper to get solution")
+
+    #     inner = GaussElemination(upper,Y,self.sig)
+    #     sol = inner.backSub()
+
+    #     if self.step_by_step:
+    #         print(f"Solution = {sol}")
+    #         print("**** Crout end ****")
+
+    #     return sol
     
     def cholesky(self):
         if self.step_by_step:
