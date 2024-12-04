@@ -3,8 +3,8 @@ from GaussElemination import GaussElemination
 from Method import Method,Equations
 TOL = 1e-7
 class LU(Method):
-    def __init__(self, coff, sol, method, sig=5):
-        super().__init__(coff, sol, sig)
+    def __init__(self, coff, sol, method, sig=5, step_by_step=False):
+        super().__init__(coff, sol, sig, step_by_step)
         self.method = method
 
     def apply(self):
@@ -49,7 +49,10 @@ class LU(Method):
             U = np.dot(L,U)
         np.fill_diagonal(LF, 1)
         
-        # Solving using lower
+        # Solving 
+        if self.step_by_step:
+            print("Solving using lower and upper :")
+            print("Applying gauss elimination then forward sub. on lower to get Y") 
 
         order = np.array(o, dtype=int)
         sort = self.sol[order]
@@ -57,6 +60,11 @@ class LU(Method):
         Y = outer.forwardSub()
         inner = GaussElemination(U,Y,self.sig)
         sol = inner.backSub()
+
+        if self.step_by_step:
+            print(f"Solution = {sol}")
+            print("**** Doolittle end ****")
+
         return sol
     
     def crout(self):
@@ -66,7 +74,19 @@ class LU(Method):
         upper = np.eye(n)
         P = np.eye(n)
 
+        if self.step_by_step:
+            print("Lower = ")
+            print(lower)
+            print("Upper = ")
+            print(upper)
+
         for j in range(n):
+
+            if self.step_by_step:
+                    print("a = ")
+                    print(self.coff)
+                    print("b = ")
+                    print(self.sol)
 
             for i in range(j, n):
                 sum = 0
@@ -74,12 +94,25 @@ class LU(Method):
                     sum += self.sign(lower[i, k] * upper[k, j])
                 lower[i, j] = self.sign(self.coff[i, j] - sum)
 
+                if self.step_by_step:
+                    print(f"lower[{i}][{j}] = {lower[i][j]}")
+                    print(f"lower = ")
+                    print(lower)
+
             for i in range(j + 1, n):
                 sum = 0
                 for k in range(j):
                     sum += self.sign(lower[j, k] * upper[k, i])
+                
+                if self.step_by_step:
+                    print(f"product = {sum}")
+
                 if abs(lower[j, j]) < TOL:
-                    raise ValueError("Singular Matrix")
+                    if self.step_by_step:
+                        print(f"product is almost 0 which means it's a singular matrix")
+
+                    raise ZeroDivisionError("Singular Matrix")
+                
                 upper[j, i] = self.sign((self.coff[j, i] - sum) / lower[j, j])
 
         # Solving using lower
@@ -87,20 +120,44 @@ class LU(Method):
         print(lower)
         outer = GaussElemination(lower,self.sol,self.sig)
         Y = outer.forwardSub()
+
+        if self.step_by_step:
+            print(f"Y = {Y}")
+            print("Applying gauss elimination then back sub. on upper to get solution")
+
         inner = GaussElemination(upper,Y,self.sig)
         sol = inner.backSub()
+
+        if self.step_by_step:
+            print(f"Solution = {sol}")
+            print("**** Crout end ****")
+
         return sol
     
     def cholesky(self):
+        if self.step_by_step:
+            print("**** Cholesky start ****")
+            print("a = ")
+            print(self.coff)
+            print("b = ")
+            print(self.sol)
+
         if TOL <= 0:
             raise ValueError("Tolerance must be a positive number")
         n = len(self.coff)
 
         if not np.allclose(self.coff, self.coff.T, atol=TOL):
+            if self.step_by_step:
+                print("Matrix is not symmetric")
+
             raise ValueError("Input matrix must be symmetric")
         
         lower = np.zeros((n, n))
         P = np.eye(n)
+
+        if self.step_by_step:
+            print("Lower = ")
+            print(lower)
 
         for i in range(n):
     
@@ -110,23 +167,60 @@ class LU(Method):
                     for k in range(j):
                         sum += self.sign(lower[j, k] ** 2)
                     diff = self.sign(self.coff[j, j] - sum)
+
+                    if self.step_by_step:
+                        print(f"for [{i}][{j}] , diff = {diff} (diagonal)")
+
                     if diff < 0:
+                        if self.step_by_step:
+                            print("As diff < 0 , Matrix is not positive definite")
+
                         raise ValueError("Matrix is not positive definite")
                     lower[j, j] = self.sign(np.sqrt(diff))
+
+                    if self.step_by_step:
+                        print(f"lower[{j}][{j}] = sqrt(diff) = {lower[j][j]}")
+                        print(f"lower = ")
+                        print(lower)
+
                 else:
                     for k in range(j):
                         sum += self.sign(lower[i, k] * lower[j, k])
                     if abs(lower[j, j]) < TOL:
-                        raise ValueError("Singular Matrix")
+                        if self.step_by_step:
+                            print(f"lower[{j}][{j}] equals (is almost) 0 which means it's a singular matrix")
+
+                        raise ZeroDivisionError("Singular Matrix")
                     lower[i, j] = self.sign((self.coff[i, j] - sum) / lower[j, j])
 
-        # return lower, lower.T
+                    if self.step_by_step:
+                        print(f"lower[{i}][{j}] = {lower[i][j]}")
+                        print(f"lower = ")
+                        print(lower)
+                    
+
+        if self.step_by_step:
+            print(f"Upper = lower.T = ")
+            print(lower.T)
+            print()
+            print("Solving :")
+            print("Applying gauss elimination then forward sub. on lower to get Y")
 
         # Solving using lower
         outer = GaussElemination(lower,self.sol,self.sig)
         Y = outer.forwardSub()
+
+        if self.step_by_step:
+            print(f"Y = {Y}")
+            print("Applying gauss elimination then back sub. on upper to get solution")
+
         inner = GaussElemination(lower.T,Y,self.sig)
         sol = inner.backSub()
+
+        if self.step_by_step:
+            print(f"Solution = {sol}")
+            print("**** Cholesky end ****")
+            
         return sol
 
 
