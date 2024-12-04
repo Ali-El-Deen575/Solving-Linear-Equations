@@ -15,6 +15,7 @@ class GaussJordan(Method):
             print("b = ")
             print(self.sol)
 
+        self.forwardElimination()
         self.reducedEchelon()
 
         if self.step_by_step:
