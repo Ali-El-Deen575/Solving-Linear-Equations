@@ -12,6 +12,8 @@ class GaussElemination(Method):
             print("b = ")
             print(self.sol)
         
+        for i in range (len(self.coff)):
+            self.forwardElemination(i , i)
         x = self.backSub()
         if self.step_by_step:
             print("**** Gauss Elemination end ****")
@@ -22,5 +24,5 @@ if __name__ == "__main__":
     sol = sol.astype(float)
     coff = np.array([[3, 2, -1],[1, 3, 2],[2, -1, 4]])
     coff = coff.astype(float)
-    jr =GaussElemination(coff,sol,4)
+    jr =GaussElemination(coff,sol,4 , True)
     print(jr.apply())
