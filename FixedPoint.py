@@ -10,31 +10,38 @@ class FixedPoint:
 
     def apply(self):
         x = self.x0
+        iter_count = 0
+        ea = 100.0  # Initialize error to a large value
+
         if self.step_by_step:
             print("**** Fixed Point Iteration start ****")
             print(f"Initial guess: x0 = {x}")
 
-        for i in range(self.max_iter):
+        while ea > self.tol and iter_count < self.max_iter:
+            x_old = x
             try:
-                x_new = self.g(x)
+                x = self.g(x_old)
             except (OverflowError, ZeroDivisionError) as e:
                 raise ValueError(f"Error during evaluation of g(x): {e}")
             except Exception as e:
                 raise ValueError(f"Unexpected error during evaluation of g(x): {e}")
 
-            error = abs(x_new - x) / max(abs(x_new), 1.0)
+            # Compute relative error
+            if x != 0:
+                ea = abs((x - x_old) / x) * 100
+
+            iter_count += 1
+
             if self.step_by_step:
-                print(f"Iteration {i+1}: x_new = {x_new}, relative error = {error}")
+                print(f"Iteration {iter_count}: x = {x}, relative error = {ea}")
 
-            if error < self.tol:
-                if self.step_by_step:
-                    print(f"Converged to {x_new} after {i+1} iterations")
-                    print("**** Fixed Point Iteration end ****")
-                return x_new, i + 1
+            if math.isinf(x) or math.isnan(x):
+                raise ValueError(f"Iteration diverged at step {iter_count}: x = {x}")
 
-            if math.isinf(x_new) or math.isnan(x_new):
-                raise ValueError(f"Iteration diverged at step {i+1}: x_new = {x_new}")
-
-            x = x_new
-
-        raise ValueError(f"Iteration did not converge within {self.max_iter} iterations. Last value: {x}")
+        if ea <= self.tol:
+            if self.step_by_step:
+                print(f"Converged to {x} after {iter_count} iterations")
+                print("**** Fixed Point Iteration end ****")
+            return x, iter_count
+        else:
+            raise ValueError(f"Iteration did not converge within {self.max_iter} iterations. Last value: {x}")
