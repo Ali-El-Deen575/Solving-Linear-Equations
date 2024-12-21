@@ -11,7 +11,7 @@ class FixedPoint:
     def apply(self):
         x = self.x0
         iter_count = 0
-        ea = 100.0  # Initialize error to a large value
+        ea = 100.0
 
         if self.step_by_step:
             print("**** Fixed Point Iteration start ****")
@@ -26,7 +26,6 @@ class FixedPoint:
             except Exception as e:
                 raise ValueError(f"Unexpected error during evaluation of g(x): {e}")
 
-            # Compute relative error
             if x != 0:
                 ea = abs((x - x_old) / x) * 100
 
