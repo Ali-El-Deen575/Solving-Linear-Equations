@@ -10,7 +10,11 @@ from Gaussjordan import GaussJordan
 from LU import LU
 from Jacobi import Jacobi
 from GaussSeidel import GaussSeidel
-from Method import Equations  
+from Method import Equations 
+from sympy import *
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.ticker import AutoMinorLocator, MaxNLocator
 from PyQt5.uic import loadUiType
 from os import path 
 import sys 
@@ -35,9 +39,59 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
         self.EnterSigFigures.clicked.connect(self.setSigNo)
         self.method.currentTextChanged.connect(self.parameters)
         self.ScalingCheckBox.stateChanged.connect(self.toggleScaling)
+        self.FindSolNonLin.clicked.connect(self.setNonLinEquation)
+        self.drawGraph.clicked.connect(self.plot_expression)
         self.parameters()
-    
+        self.figure, self.ax = plt.subplots(figsize=(8, 6)) 
 
+        self.canvas = FigureCanvas(self.figure)
+        
+        layout = QVBoxLayout(self.plotWidget)
+        layout.addWidget(self.canvas)
+
+
+        self.plotWidget.setLayout(layout)
+
+       
+        self.scrollAreaPlot.setWidgetResizable(True)
+
+    def plot_expression(self):
+        
+        if(self.is_valid_sympy_expression(self.equation.toPlainText())):
+            expression = self.equation.toPlainText()
+
+            try:
+                x = symbols('x') 
+                expr = sympify(expression)  
+
+              
+                x_vals = np.linspace(-100, 100, 1000)
+                y_vals = [float(expr.subs(x, val)) for val in x_vals]
+
+                # Plot the graph
+                self.ax.clear()
+                self.ax.plot(x_vals, y_vals, label=str(expr))
+                self.ax.axhline(0, color='black', linewidth=0.8) 
+                self.ax.axvline(0, color='black', linewidth=0.8)  
+                self.ax.grid(True)  
+                self.ax.set_xlim(-10, 10)  
+                self.ax.set_ylim(-10, 10)
+                self.ax.set_title("Graph of the Expression")
+                self.ax.set_xlabel("x")
+                self.ax.set_ylabel("y")
+                self.ax.legend()
+                self.ax.xaxis.set_major_locator(MaxNLocator(integer=True, prune='both'))
+                self.ax.yaxis.set_major_locator(MaxNLocator(integer=True, prune='both'))
+                self.ax.xaxis.set_minor_locator(AutoMinorLocator(4)) 
+                self.ax.yaxis.set_minor_locator(AutoMinorLocator(4))
+
+                self.ax.grid(which='both', linestyle='--', linewidth=0.5)  
+                self.canvas.setMinimumSize(1000, 1000) 
+               
+                self.canvas.draw()
+
+            except Exception as e:
+                QMessageBox.warning(self, "Error", f"An error occurred: {e}")
     def toggleScaling(self, state):
         if state == QtCore.Qt.Checked:
             self.scaling = True
@@ -293,7 +347,25 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                     eqn += f"({self.system.coff[i,j]}) X{j+1} +"
             eqn +=  f"{self.system.sol[i]}\n"
         return eqn      
+    def setNonLinEquation(self):
+        if(self.equation.toPlainText() != ""):
+            if(self.is_valid_sympy_expression(self.equation.toPlainText())):
+                
+                expr = self.equation.toPlainText()
+                init_printing()
+                print(expr)
+            else:
+                QMessageBox.warning(self, "Validation Result", "Invalid variable!")     
 
+    def is_valid_sympy_expression(self, expression):
+        try:
+            x = symbols('x')
+            expr = sympify(expression)
+            return expr.free_symbols.issubset({x})
+            
+        except SympifyError:
+            QMessageBox.warning(self, "Validation Result", "Invalid expression!")
+            return False        
     
 def loadStylesheet():
     try:

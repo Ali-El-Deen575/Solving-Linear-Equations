@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>1329</width>
+    <height>909</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -338,7 +338,7 @@
      <rect>
       <x>70</x>
       <y>280</y>
-      <width>271</width>
+      <width>341</width>
       <height>251</height>
      </rect>
     </property>
@@ -350,7 +350,7 @@
       <rect>
        <x>10</x>
        <y>20</y>
-       <width>251</width>
+       <width>321</width>
        <height>221</height>
       </rect>
      </property>
@@ -365,7 +365,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>249</width>
+        <width>319</width>
         <height>219</height>
        </rect>
       </property>
@@ -374,7 +374,7 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>251</width>
+         <width>321</width>
          <height>221</height>
         </rect>
        </property>
@@ -388,9 +388,9 @@
    <widget class="QGroupBox" name="groupBox_2">
     <property name="geometry">
      <rect>
-      <x>600</x>
-      <y>280</y>
-      <width>171</width>
+      <x>420</x>
+      <y>410</y>
+      <width>351</width>
       <height>121</height>
      </rect>
     </property>
@@ -402,8 +402,8 @@
       <rect>
        <x>30</x>
        <y>40</y>
-       <width>101</width>
-       <height>20</height>
+       <width>301</width>
+       <height>41</height>
       </rect>
      </property>
      <property name="text">
@@ -414,9 +414,9 @@
    <widget class="QGroupBox" name="groupBox_3">
     <property name="geometry">
      <rect>
-      <x>600</x>
-      <y>410</y>
-      <width>171</width>
+      <x>420</x>
+      <y>280</y>
+      <width>351</width>
       <height>121</height>
      </rect>
     </property>
@@ -426,10 +426,10 @@
     <widget class="QLabel" name="Iterations">
      <property name="geometry">
       <rect>
-       <x>30</x>
-       <y>50</y>
-       <width>81</width>
-       <height>20</height>
+       <x>110</x>
+       <y>40</y>
+       <width>151</width>
+       <height>51</height>
       </rect>
      </property>
      <property name="text">
@@ -440,10 +440,10 @@
    <widget class="QGroupBox" name="groupBox_4">
     <property name="geometry">
      <rect>
-      <x>350</x>
-      <y>280</y>
-      <width>241</width>
-      <height>251</height>
+      <x>70</x>
+      <y>530</y>
+      <width>341</width>
+      <height>321</height>
      </rect>
     </property>
     <property name="title">
@@ -454,8 +454,8 @@
       <rect>
        <x>10</x>
        <y>20</y>
-       <width>221</width>
-       <height>221</height>
+       <width>321</width>
+       <height>291</height>
       </rect>
      </property>
      <property name="sizeAdjustPolicy">
@@ -469,8 +469,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>219</width>
-        <height>219</height>
+        <width>319</width>
+        <height>289</height>
        </rect>
       </property>
       <widget class="QTextEdit" name="view">
@@ -478,8 +478,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>221</width>
-         <height>221</height>
+         <width>321</width>
+         <height>291</height>
         </rect>
        </property>
        <property name="readOnly">
@@ -515,13 +515,255 @@
      <string>Siginificant figures</string>
     </property>
    </widget>
+   <widget class="QGroupBox" name="groupBox_5">
+    <property name="geometry">
+     <rect>
+      <x>790</x>
+      <y>10</y>
+      <width>531</width>
+      <height>841</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>non-linear equations</string>
+    </property>
+    <widget class="QTextEdit" name="equation">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>70</y>
+       <width>491</width>
+       <height>51</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_2">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>40</y>
+       <width>55</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Equation</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="InitiaGuessLabel_2">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>180</y>
+       <width>71</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Initial guess</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="NonLinearGuess">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>180</y>
+       <width>141</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="placeholderText">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="methodLabel_2">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>140</y>
+       <width>55</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>method</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="NonLinearMethod">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>140</y>
+       <width>391</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <item>
+      <property name="text">
+       <string>Bisection</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>False-Position</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Fixed Point</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Original Netwon Raphson</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Modified Newton Raphson</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Secant</string>
+      </property>
+     </item>
+    </widget>
+    <widget class="QLabel" name="InitiaGuessLabel_3">
+     <property name="geometry">
+      <rect>
+       <x>280</x>
+       <y>180</y>
+       <width>51</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>interval</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="interval">
+     <property name="geometry">
+      <rect>
+       <x>350</x>
+       <y>180</y>
+       <width>161</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="placeholderText">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="FindSolNonLin">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>220</y>
+       <width>93</width>
+       <height>28</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Find Solution</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="drawGraph">
+     <property name="geometry">
+      <rect>
+       <x>350</x>
+       <y>220</y>
+       <width>93</width>
+       <height>28</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Draw graph</string>
+     </property>
+    </widget>
+    <widget class="QScrollArea" name="scrollAreaPlot">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>280</y>
+       <width>511</width>
+       <height>551</height>
+      </rect>
+     </property>
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="plotWidget">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>509</width>
+        <height>549</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_6">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>530</y>
+      <width>351</width>
+      <height>321</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Steps</string>
+    </property>
+    <widget class="QScrollArea" name="scrollArea_3">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>331</width>
+       <height>291</height>
+      </rect>
+     </property>
+     <property name="sizeAdjustPolicy">
+      <enum>QAbstractScrollArea::AdjustToContents</enum>
+     </property>
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="scrollAreaWidgetContents_3">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>329</width>
+        <height>289</height>
+       </rect>
+      </property>
+      <widget class="QTextEdit" name="steps">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>331</width>
+         <height>291</height>
+        </rect>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </widget>
+    </widget>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>1329</width>
      <height>26</height>
     </rect>
    </property>
