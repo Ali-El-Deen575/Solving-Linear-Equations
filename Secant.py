@@ -55,6 +55,6 @@ class Secant:
                 if self.step_by_step:
                     print(f"Converged to {x2} after {iter_count} iterations")
                     print("**** Secant Method end ****")
-                return x2, iter_count
+                return x2, iter_count ,ea
 
         raise ValueError(f"Iteration did not converge within {self.max_iter} iterations. Last value: {x2}")

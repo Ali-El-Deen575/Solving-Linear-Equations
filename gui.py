@@ -4,6 +4,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
+from Bisection import Bisection
+from FalsePosition import FalsePosition
 from GaussElemination import GaussElemination
 from Gaussjordan import GaussJordan
 from LU import LU
@@ -323,12 +325,12 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                             fixed_point = FixedPoint(expression, x0, tol, max_iter, step_by_step)
                             try:
                                 startTime = time.time()
-                                res, it = fixed_point.apply()
+                                res, it,ea = fixed_point.apply()
                             except ValueError as e:
                                 QMessageBox.warning(self, "Error", f"An error occurred: {e}")
                             else:
                                 EndTime = time.time()
-                                self.result.setText(f"Root: {res}")
+                                self.result.setText(f"Root: {res}\nRelative Error: {ea}")
                                 self.Iterations.setText(f"{it}")
                                 self.time.setText(f"{EndTime - startTime}")
                         else:
@@ -357,12 +359,12 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                             secant = Secant(expression, x0, x1, tol, max_iter, step_by_step)
                             try:
                                 startTime = time.time()
-                                res, it = secant.apply()
+                                res, it ,ea= secant.apply()
                             except ValueError as e:
                                 QMessageBox.warning(self, "Error", f"An error occurred: {e}")
                             else:
                                 EndTime = time.time()
-                                self.result.setText(f"Root: {res}")
+                                self.result.setText(f"Root: {res}\nRelative Error: {ea}")
                                 self.Iterations.setText(f"{it}")
                                 self.time.setText(f"{EndTime - startTime}")
                         else:
@@ -372,7 +374,77 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                 else:
                     QMessageBox.warning(self, "Validation Result", "Invalid initial guesses! Please enter x0 and x1 separated by a comma.")
             else:
-                QMessageBox.warning(self, "Validation Result", "Invalid expression!")        
+                QMessageBox.warning(self, "Validation Result", "Invalid expression!")
+
+        elif(self.NonLinearMethod.currentText()=="Bisection"):
+            if(self.is_valid_sympy_expression(self.equation.toPlainText())):
+                expression = self.equation.toPlainText()
+                interval = self.NonLinearGuess.text().split(',')
+                if len(interval) == 2 and self.is_number(interval[0]) and self.is_number(interval[1]):
+                    a = float(interval[0])
+                    b = float(interval[1])
+                    tol = self.tolerance.text()
+                    if(tol != "" and self.is_number(tol)):
+                        tol = float(tol)
+                        max_iter = self.iterations.text()
+                        if(max_iter != "" and self.isWholeNumber(max_iter)):
+                            max_iter = int(max_iter)
+                            step_by_step = self.stepsBox.isChecked()
+                            bisection = Bisection(expression, a, b, tol, max_iter, step_by_step)
+                            try:
+                                startTime = time.time()
+                                res, it, ea = bisection.solve()
+                            except ValueError as e:
+                                QMessageBox.warning(self, "Error", f"An error occurred: {e}")
+                            else:
+                                EndTime = time.time()
+                                self.result.setText(f"Root: {res}\nRelative Error: {ea}")
+                                self.Iterations.setText(f"{it}")
+                                self.time.setText(f"{EndTime - startTime}")
+                               
+                        else:
+                            QMessageBox.warning(self, "Validation Result", "Invalid maximum number of iterations!")
+                    else:
+                        QMessageBox.warning(self, "Validation Result", "Invalid tolerance!")
+                else:
+                    QMessageBox.warning(self, "Validation Result", "Invalid interval! Please enter a and b separated by a comma.")
+            else:
+                QMessageBox.warning(self, "Validation Result", "Invalid expression!")
+
+        elif(self.NonLinearMethod.currentText()=="False-Position"):
+            if(self.is_valid_sympy_expression(self.equation.toPlainText())):
+                expression = self.equation.toPlainText()
+                interval = self.NonLinearGuess.text().split(',')
+                if len(interval) == 2 and self.is_number(interval[0]) and self.is_number(interval[1]):
+                    a = float(interval[0])
+                    b = float(interval[1])
+                    tol = self.tolerance.text()
+                    if(tol != "" and self.is_number(tol)):
+                        tol = float(tol)
+                        max_iter = self.iterations.text()
+                        if(max_iter != "" and self.isWholeNumber(max_iter)):
+                            max_iter = int(max_iter)
+                            step_by_step = self.stepsBox.isChecked()
+                            false_position = FalsePosition(expression, a, b, tol, max_iter, step_by_step)
+                            try:
+                                startTime = time.time()
+                                res, it, ea = false_position.solve()
+                            except ValueError as e:
+                                QMessageBox.warning(self, "Error", f"An error occurred: {e}")
+                            else:
+                                EndTime = time.time()
+                                self.result.setText(f"Root: {res}\nRelative Error: {ea}")
+                                self.Iterations.setText(f"{it}")
+                                self.time.setText(f"{EndTime - startTime}")
+                        else:
+                            QMessageBox.warning(self, "Validation Result", "Invalid maximum number of iterations!")
+                    else:
+                        QMessageBox.warning(self, "Validation Result", "Invalid tolerance!")
+                else:
+                    QMessageBox.warning(self, "Validation Result", "Invalid interval! Please enter a and b separated by a comma.")
+            else:
+                QMessageBox.warning(self, "Validation Result", "Invalid expression!")           
+
     def scale_matrix(self, A, B):
         n = A.shape[0]
         for i in range(n):

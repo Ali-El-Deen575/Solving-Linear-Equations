@@ -45,6 +45,6 @@ class FixedPoint:
             if self.step_by_step:
                 print(f"Converged to {x} after {iter_count} iterations")
                 print("**** Fixed Point Iteration end ****")
-            return x, iter_count
+            return x, iter_count ,ea
         else:
             raise ValueError(f"Iteration did not converge within {self.max_iter} iterations. Last value: {x}")

@@ -16,20 +16,19 @@ class Bisection:
         a, b = self.lower, self.upper
         if self.function(a) * self.function(b) > 0:
             raise ValueError("No root found. The function must have opposite signs at the interval boundaries.")
-
-        start_time = time.time()
+        c_old = 0
         for iteration in range(1, self.max_iterations + 1):
+            
             c = (a + b) / 2
             fc = self.function(c)
             if self.step_by_step:
                 print(f"Iteration {iteration}: a = {a}, b = {b}, c = {c}, f(c) = {fc}")
 
-            if abs(fc) < self.epsilon or abs(b - a) < self.epsilon:
-                execution_time = time.time() - start_time
+            if  abs((c-c_old)/c) < self.epsilon:
                 if self.step_by_step:
                     print(f"Converged to {c} after {iteration} iterations")
-                return c, iteration, abs(b - a), execution_time
-
+                return c, iteration, abs((c-c_old)/c)*100 
+            c_old = c
             if self.function(a) * fc < 0:
                 b = c
             else:
