@@ -1,3 +1,4 @@
+import math
 import numpy as np
 import time
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -326,11 +327,12 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                             try:
                                 startTime = time.time()
                                 res, it,ea = fixed_point.apply()
+                                correctFig = floor(2-int(math.log10(2*ea)))
                             except ValueError as e:
                                 QMessageBox.warning(self, "Error", f"An error occurred: {e}")
                             else:
                                 EndTime = time.time()
-                                self.result.setText(f"Root: {res}\nRelative Error: {ea}")
+                                self.result.setText(f"Root: {res}\nRelative Error: {ea}\nCorrect to {correctFig} significant figures")
                                 self.Iterations.setText(f"{it}")
                                 self.time.setText(f"{EndTime - startTime}")
                         else:
@@ -360,11 +362,12 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                             try:
                                 startTime = time.time()
                                 res, it ,ea= secant.apply()
+                                correctFig = floor(2-int(math.log10(2*ea)))
                             except ValueError as e:
                                 QMessageBox.warning(self, "Error", f"An error occurred: {e}")
                             else:
                                 EndTime = time.time()
-                                self.result.setText(f"Root: {res}\nRelative Error: {ea}")
+                                self.result.setText(f"Root: {res}\nRelative Error: {ea}\nCorrect to {correctFig} significant figures")
                                 self.Iterations.setText(f"{it}")
                                 self.time.setText(f"{EndTime - startTime}")
                         else:
@@ -394,11 +397,12 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                             try:
                                 startTime = time.time()
                                 res, it, ea = bisection.solve()
+                                correctFig = floor(2-int(math.log10(2*ea)))
                             except ValueError as e:
                                 QMessageBox.warning(self, "Error", f"An error occurred: {e}")
                             else:
                                 EndTime = time.time()
-                                self.result.setText(f"Root: {res}\nRelative Error: {ea}")
+                                self.result.setText(f"Root: {res}\nRelative Error: {ea}\nCorrect to {correctFig} significant figures")
                                 self.Iterations.setText(f"{it}")
                                 self.time.setText(f"{EndTime - startTime}")
                                
@@ -429,11 +433,12 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                             try:
                                 startTime = time.time()
                                 res, it, ea = false_position.solve()
+                                correctFig = floor(2-int(math.log10(2*ea)))
                             except ValueError as e:
                                 QMessageBox.warning(self, "Error", f"An error occurred: {e}")
                             else:
                                 EndTime = time.time()
-                                self.result.setText(f"Root: {res}\nRelative Error: {ea}")
+                                self.result.setText(f"Root: {res}\nRelative Error: {ea}\nCorrect to {correctFig} significant figures")
                                 self.Iterations.setText(f"{it}")
                                 self.time.setText(f"{EndTime - startTime}")
                         else:
