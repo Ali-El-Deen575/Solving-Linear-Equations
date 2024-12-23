@@ -10,6 +10,7 @@ from Gaussjordan import GaussJordan
 from LU import LU
 from Jacobi import Jacobi
 from GaussSeidel import GaussSeidel
+from FixedPoint import FixedPoint
 from Method import Equations 
 from sympy import *
 import matplotlib.pyplot as plt
@@ -41,6 +42,7 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
         self.ScalingCheckBox.stateChanged.connect(self.toggleScaling)
         self.FindSolNonLin.clicked.connect(self.setNonLinEquation)
         self.drawGraph.clicked.connect(self.plot_expression)
+        self.FindSolNonLin.clicked.connect(self.findSolNonLin)
         self.parameters()
         self.figure, self.ax = plt.subplots(figsize=(8, 6)) 
 
@@ -56,8 +58,7 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
         self.scrollAreaPlot.setWidgetResizable(True)
 
     def plot_expression(self):
-        
-        if(self.is_valid_sympy_expression(self.equation.toPlainText())):
+            self.setNonLinEquation()
             expression = self.equation.toPlainText()
 
             try:
@@ -65,12 +66,23 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                 expr = sympify(expression)  
 
               
-                x_vals = np.linspace(-100, 100, 1000)
-                y_vals = [float(expr.subs(x, val)) for val in x_vals]
+                x_vals = np.linspace(-100, 100, 5000)
+                y_vals = []
+
+                for val in x_vals:
+                    try:
+                       
+                        y = float(expr.subs(x, val))
+                        y_vals.append(y)
+                    except (ZeroDivisionError, ValueError):
+                        y_vals.append(np.nan)
 
                 # Plot the graph
                 self.ax.clear()
                 self.ax.plot(x_vals, y_vals, label=str(expr))
+                if(self.NonLinearMethod.currentText() == "Fixed Point"):
+                    self.ax.plot(x_vals, x_vals, label="y = x", color="red")
+       
                 self.ax.axhline(0, color='black', linewidth=0.8) 
                 self.ax.axvline(0, color='black', linewidth=0.8)  
                 self.ax.grid(True)  
@@ -293,7 +305,39 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                                 self.result.setText(self.result.toPlainText()+f"X{i+1} = {res[i]}\n")
                             self.time.setText(f"{EndTime - startTime}")
                             self.Iterations.setText(f"{it}")                               
-
+    def findSolNonLin(self):
+        if(self.NonLinearMethod.currentText()=="Fixed Point"):
+            if(self.is_valid_sympy_expression(self.equation.toPlainText())):
+                expression = self.equation.toPlainText() 
+                x0 = self.NonLinearGuess.text()
+                if(x0 != "" and self.is_number(x0)):
+                    x0 = float(x0)
+                    tol = self.tolerance.text()
+                    if(tol != "" and self.is_number(tol)):
+                        tol = float(tol)
+                        max_iter = self.iterations.text()
+                        if(max_iter != "" and self.isWholeNumber(max_iter)):
+                            max_iter = int(max_iter)
+                            step_by_step = self.stepsBox.isChecked()
+                            fixed_point = FixedPoint(expression, x0, tol, max_iter, step_by_step)
+                            try:
+                                startTime = time.time()
+                                res, it = fixed_point.apply()
+                            except ValueError as e:
+                                QMessageBox.warning(self, "Error", f"An error occurred: {e}")
+                            else:
+                                EndTime = time.time()
+                                self.result.setText(f"Root: {res}")
+                                self.Iterations.setText(f"{it}")
+                                self.time.setText(f"{EndTime - startTime}")
+                        else:
+                            QMessageBox.warning(self, "Validation Result", "Invalid maximum number of iterations!")
+                    else:
+                        QMessageBox.warning(self, "Validation Result", "Invalid tolerance!")
+                else:
+                    QMessageBox.warning(self, "Validation Result", "Invalid initial guess!")
+            else:
+                QMessageBox.warning(self, "Validation Result", "Invalid expression!")
     def scale_matrix(self, A, B):
         n = A.shape[0]
         for i in range(n):

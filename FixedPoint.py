@@ -1,12 +1,16 @@
 import math
 
+from sympy import lambdify, symbols, sympify
+
 class FixedPoint:
     def __init__(self, g, x0, tol=1e-5, max_iter=100, step_by_step=False):
-        self.g = g
+        self.g = sympify(g)
         self.x0 = x0
         self.tol = tol
         self.max_iter = max_iter
         self.step_by_step = step_by_step
+        self.x = symbols('x')
+        self.g = lambdify(self.x, self.g)
 
     def apply(self):
         x = self.x0
@@ -27,7 +31,7 @@ class FixedPoint:
                 raise ValueError(f"Unexpected error during evaluation of g(x): {e}")
 
             if x != 0:
-                ea = abs((x - x_old) / x) * 100
+                ea = abs((x - x_old) / x) 
 
             iter_count += 1
 
