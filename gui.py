@@ -1,4 +1,3 @@
-
 import numpy as np
 import time
 from PyQt5 import QtCore, QtGui, QtWidgets
