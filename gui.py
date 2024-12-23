@@ -17,7 +17,9 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.ticker import AutoMinorLocator, MaxNLocator
 from PyQt5.uic import loadUiType
 from os import path 
-import sys 
+import sys
+
+from Secant import Secant
         
 mainWindowFileName = "test.ui"                
 FORM_CLASS, _ = loadUiType(path.join(path.dirname(__file__), mainWindowFileName))
@@ -337,6 +339,40 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                     QMessageBox.warning(self, "Validation Result", "Invalid initial guess!")
             else:
                 QMessageBox.warning(self, "Validation Result", "Invalid expression!")
+
+        elif(self.NonLinearMethod.currentText()=="Secant"):
+            if(self.is_valid_sympy_expression(self.equation.toPlainText())):
+                expression = self.equation.toPlainText()
+                guesses = self.NonLinearGuess.text().split(',')
+                if len(guesses) == 2 and self.is_number(guesses[0]) and self.is_number(guesses[1]):
+                    x0 = float(guesses[0])
+                    x1 = float(guesses[1])
+                    tol = self.tolerance.text()
+                    if(tol != "" and self.is_number(tol)):
+                        tol = float(tol)
+                        max_iter = self.iterations.text()
+                        if(max_iter != "" and self.isWholeNumber(max_iter)):
+                            max_iter = int(max_iter)
+                            step_by_step = self.stepsBox.isChecked()
+                            secant = Secant(expression, x0, x1, tol, max_iter, step_by_step)
+                            try:
+                                startTime = time.time()
+                                res, it = secant.apply()
+                            except ValueError as e:
+                                QMessageBox.warning(self, "Error", f"An error occurred: {e}")
+                            else:
+                                EndTime = time.time()
+                                self.result.setText(f"Root: {res}")
+                                self.Iterations.setText(f"{it}")
+                                self.time.setText(f"{EndTime - startTime}")
+                        else:
+                            QMessageBox.warning(self, "Validation Result", "Invalid maximum number of iterations!")
+                    else:
+                        QMessageBox.warning(self, "Validation Result", "Invalid tolerance!")
+                else:
+                    QMessageBox.warning(self, "Validation Result", "Invalid initial guesses! Please enter x0 and x1 separated by a comma.")
+            else:
+                QMessageBox.warning(self, "Validation Result", "Invalid expression!")        
     def scale_matrix(self, A, B):
         n = A.shape[0]
         for i in range(n):

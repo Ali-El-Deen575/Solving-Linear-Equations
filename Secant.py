@@ -1,13 +1,15 @@
 import math
-
+from sympy import lambdify, symbols, sympify
 class Secant:
     def __init__(self, f, x0, x1, tol=1e-5, max_iter=100, step_by_step=False):
-        self.f = f
+        self.f = sympify(f)
         self.x0 = x0
         self.x1 = x1
         self.tol = tol
         self.max_iter = max_iter
         self.step_by_step = step_by_step
+        self.x = symbols('x')
+        self.f = lambdify(self.x, self.f)
 
     def apply(self):
         x0, x1 = self.x0, self.x1
@@ -37,7 +39,7 @@ class Secant:
                 raise ValueError(f"Unexpected error during evaluation of f(x): {e}")
 
             if x2 != 0:
-                ea = abs((x2 - x1) / x2) * 100
+                ea = abs((x2 - x1) / x2) 
 
             iter_count += 1
 
