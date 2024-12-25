@@ -33,7 +33,7 @@ class FixedPoint:
             steps_string += "**** Fixed Point Iteration start ****\n"
             steps_string += f"Initial guess: x0 = {x}\n"
 
-        while ea > self.tol and iter_count < self.max_iter:
+        while ea >= self.tol and iter_count < self.max_iter:
             x_old = x
             try:
                 x = self.sign_func(self.g(x_old))

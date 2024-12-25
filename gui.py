@@ -345,7 +345,7 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                                 fixed_point = FixedPoint(expression, x0, tol, max_iter, sig, step_by_step)
                                 try:
                                     startTime = time.time()
-                                    res, it, ea = fixed_point.apply()
+                                    res, it, ea, step = fixed_point.apply()
                                     correctFig = floor(-int(math.log10(ea))) if ea != 0 else 0
                                 except ValueError as e:
                                     QMessageBox.warning(self, "Error", f"An error occurred: {e}")
@@ -354,6 +354,7 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                                     self.result.setText(f"Root: {res}\nRelative Error: {ea*100}%\n")
                                     if correctFig != 0:
                                         self.result.setText(self.result.toPlainText() + f"Correct to {correctFig} significant figures")
+                                    self.steps.setText(step)    
                                     self.Iterations.setText(f"{it}")
                                     self.time.setText(f"{EndTime - startTime}")
                             else:
