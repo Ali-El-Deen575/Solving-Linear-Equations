@@ -6,9 +6,10 @@ from math import log10, floor
 # from Method import sign
 
 class NewtonRaphson:
-    def __init__(self, function, initial_guess , m=1, tolerance=1e-5 , sign=None, max_iterations=1000 , step_by_step=False):
+    def __init__(self, function , initial_guess , modified=False , m=None, tolerance=1e-5 , sign=None, max_iterations=1000 , step_by_step=False):
         self.function = sp(function)
         self.initial_guess = initial_guess
+        self.modified = modified
         self.m = m
         self.tolerance = tolerance
         self.sign = sign
@@ -37,32 +38,57 @@ class NewtonRaphson:
         steps_string = ""
 
         # Derivatives of the function
-        derivatives = [self.function]      
-        for i in range(self.m):
-            derivatives.append(derivatives[-1].diff())
+        # derivatives = [self.function]      
+        # for i in range(self.m):
+            # derivatives.append(derivatives[-1].diff())
+
+        f_prime = self.function.diff()
+        if self.modified and self.m == None:
+            f_prime_prime = f_prime.diff()
 
         
         if self.step_by_step:
             steps_string +=(f"simplified equation: {self.function}\n")
-            steps_string +=(f"1st derivative of the equation: {derivatives[1]}\n")
+            steps_string +=(f"1st derivative of the equation: {f_prime}\n")
+            if self.modified and self.m == None:
+                steps_string +=(f"2nd derivative of the equation: {f_prime_prime}\n")
             steps_string +=(f"Initial guess: {current_guess}\n")
 
         for i in range(self.max_iterations):
-            derivatives_values = [self.sign_func(float(derivative.subs(x, current_guess))) for derivative in derivatives]
+            # derivatives_values = [self.sign_func(float(derivative.subs(x, current_guess))) for derivative in derivatives]
+            fx = self.sign_func(float(self.function.subs(x, current_guess)))
+            if fx == 0:
+                if self.step_by_step:
+                    steps_string +=(f"\nSolution found at iteration {i+1}: {current_guess}\n")
+                return current_guess , i+1 , steps_string
+            f_prime_x = self.sign_func(float(f_prime.subs(x, current_guess)))
+            if self.modified and self.m == None:
+                    f_prime_prime_x = self.sign_func(float(f_prime_prime.subs(x, current_guess)))
 
             if self.step_by_step:
-                steps_string +=(f"\nIteration {i+1}:\n\t f({current_guess}) = {derivatives_values[0]} , f'({current_guess}) = {derivatives_values[1]}\n")
+                steps_string +=(f"\nIteration {i+1}:\n\t f({current_guess}) = {fx} , f'({current_guess}) = {f_prime_x}")
+                if self.modified and self.m == None:
+                    steps_string +=(f" , f''({current_guess}) = {f_prime_prime_x}\n")
+                else:
+                    steps_string +=("\n")
 
-            if derivatives_values[1] == 0:
+            if f_prime_x == 0:
                 raise ValueError(f"Derivative is zero at iteration {i+1}. No solution found.")
             
             
-            correction = self.sign_func(derivatives_values[0] / derivatives_values[1])
-            for k in range(2, self.m + 1):
-                term = self.sign_func(derivatives_values[0] ** (k - 1) * derivatives_values[k] / (factorial(k) * derivatives_values[1] ** k))
-                correction *= self.sign_func((1 - term))
+            if self.modified and self.m == None:# Modified Newton-Raphson without multiplicity
+                next_guess = current_guess - fx * f_prime_x / (f_prime_x**2 - fx * f_prime_prime_x)
+            elif self.modified :# Modified Newton-Raphson with multiplicity
+                next_guess = self.sign_func(current_guess - self.m*fx / f_prime_x)
+            else: # Regular Newton-Raphson
+                next_guess = self.sign_func(current_guess - fx / f_prime_x)
 
-            next_guess = self.sign_func(current_guess - correction)
+            # correction = self.sign_func(derivatives_values[0] / derivatives_values[1])
+            # for k in range(2, self.m + 1):
+            #     term = self.sign_func(derivatives_values[0] ** (k - 1) * derivatives_values[k] / (factorial(k) * derivatives_values[1] ** k))
+            #     correction *= self.sign_func((1 - term))
+
+            # next_guess = self.sign_func(current_guess - correction)
 
 
             error = self.sign_func(abs(next_guess - current_guess)/abs(next_guess))
@@ -86,7 +112,7 @@ if __name__ == "__main__":
     x = symbols('x')
     expression = "x**2 -4*x + 4"
     parsed_expr = sp(expression)
-    newton = NewtonRaphson(parsed_expr, 16,  m=1 , max_iterations=25 , step_by_step=True , sign=4)
+    newton = NewtonRaphson(parsed_expr, 25 , modified=False,  m=1 , max_iterations=25 , step_by_step=True , sign=4)
     root , iterations_num , steps = newton.solve()
     print(f"Solution: {root} , Iterations: {iterations_num}")
     print(steps)
