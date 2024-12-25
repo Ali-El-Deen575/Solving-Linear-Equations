@@ -24,6 +24,7 @@ import sys
 
 from NewtonRaphson import NewtonRaphson
 from Secant import Secant
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
         
 mainWindowFileName = "test.ui"                
 FORM_CLASS, _ = loadUiType(path.join(path.dirname(__file__), mainWindowFileName))
@@ -63,20 +64,20 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
         self.scrollAreaPlot.setWidgetResizable(True)
 
     def plot_expression(self):
-            self.setNonLinEquation()
+        try:         
             expression = self.equation.toPlainText()
+            if(self.is_valid_sympy_expression(expression)):
 
-            try:
                 x = symbols('x') 
                 expr = sympify(expression)  
 
-              
+            
                 x_vals = np.linspace(-100, 100, 5000)
                 y_vals = []
 
                 for val in x_vals:
                     try:
-                       
+                    
                         y = float(expr.subs(x, val))
                         y_vals.append(y)
                     except (ZeroDivisionError, ValueError):
@@ -87,7 +88,7 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                 self.ax.plot(x_vals, y_vals, label=str(expr))
                 if(self.NonLinearMethod.currentText() == "Fixed Point"):
                     self.ax.plot(x_vals, x_vals, label="y = x", color="red")
-       
+
                 self.ax.axhline(0, color='black', linewidth=0.8) 
                 self.ax.axvline(0, color='black', linewidth=0.8)  
                 self.ax.grid(True)  
@@ -104,11 +105,16 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
 
                 self.ax.grid(which='both', linestyle='--', linewidth=0.5)  
                 self.canvas.setMinimumSize(1000, 1000) 
-               
+            
                 self.canvas.draw()
 
-            except Exception as e:
-                QMessageBox.warning(self, "Error", f"An error occurred: {e}")
+                # Add the toolbar
+                if not hasattr(self, 'toolbar'):
+                    self.toolbar = NavigationToolbar(self.canvas, self)
+                    self.layout().addWidget(self.toolbar)
+
+        except Exception as e:
+            QMessageBox.warning(self, "Error", f"An error occurred: {e}")
     def toggleScaling(self, state):
         if state == QtCore.Qt.Checked:
             self.scaling = True
