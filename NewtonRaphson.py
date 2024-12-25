@@ -7,7 +7,7 @@ from math import log10, floor
 
 class NewtonRaphson:
     def __init__(self, function, initial_guess , m=1, tolerance=1e-5 , sign=None, max_iterations=1000 , step_by_step=False):
-        self.function = function
+        self.function = sp(function)
         self.initial_guess = initial_guess
         self.m = m
         self.tolerance = tolerance
@@ -75,7 +75,7 @@ class NewtonRaphson:
                 if self.step_by_step:
                     steps_string +=(f"\nSolution found at iteration {i+1}: {next_guess}\n")
 
-                return next_guess , i+1 , steps_string
+                return next_guess , i+1 ,error, steps_string
             current_guess = next_guess
         
         print(steps_string)
@@ -84,9 +84,9 @@ class NewtonRaphson:
 
 if __name__ == "__main__":
     x = symbols('x')
-    expression = "x**3 - 2*x"
+    expression = "x**2 -4*x + 4"
     parsed_expr = sp(expression)
-    newton = NewtonRaphson(parsed_expr, 16,  m=3 , max_iterations=25 , step_by_step=True , sign=4)
+    newton = NewtonRaphson(parsed_expr, 16,  m=1 , max_iterations=25 , step_by_step=True , sign=4)
     root , iterations_num , steps = newton.solve()
     print(f"Solution: {root} , Iterations: {iterations_num}")
     print(steps)

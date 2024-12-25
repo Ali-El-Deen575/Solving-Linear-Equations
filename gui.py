@@ -22,6 +22,7 @@ from PyQt5.uic import loadUiType
 from os import path 
 import sys
 
+from NewtonRaphson import NewtonRaphson
 from Secant import Secant
         
 mainWindowFileName = "test.ui"                
@@ -312,29 +313,45 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
     def findSolNonLin(self):
         if(self.NonLinearMethod.currentText()=="Fixed Point"):
             if(self.is_valid_sympy_expression(self.equation.toPlainText())):
-                expression = self.equation.toPlainText() 
-                x0 = self.NonLinearGuess.text()
-                if(x0 != "" and self.is_number(x0)):
-                    x0 = float(x0)
+                expression = self.equation.toPlainText()
+                guess = self.NonLinearGuess.text()
+                if(guess != "" and self.is_number(guess)):
+                    x0 = float(guess)
                     tol = self.tolerance.text()
-                    if(tol != "" and self.is_number(tol)):
-                        tol = float(tol)
+                    if((tol != "" and self.is_number(tol)) or tol == ""):
+                        if(tol == ""):
+                            tol = 1e-5
+                        else:
+                            tol = float(tol)
                         max_iter = self.iterations.text()
-                        if(max_iter != "" and self.isWholeNumber(max_iter)):
-                            max_iter = int(max_iter)
-                            step_by_step = self.stepsBox.isChecked()
-                            fixed_point = FixedPoint(expression, x0, tol, max_iter, step_by_step)
-                            try:
-                                startTime = time.time()
-                                res, it,ea = fixed_point.apply()
-                                correctFig = floor(2-int(math.log10(2*ea)))
-                            except ValueError as e:
-                                QMessageBox.warning(self, "Error", f"An error occurred: {e}")
+                        if((max_iter != "" and self.isWholeNumber(max_iter)) or max_iter == ""):
+                            if(max_iter == ""):
+                                max_iter = 50
                             else:
-                                EndTime = time.time()
-                                self.result.setText(f"Root: {res}\nRelative Error: {ea}\nCorrect to {correctFig} significant figures")
-                                self.Iterations.setText(f"{it}")
-                                self.time.setText(f"{EndTime - startTime}")
+                                max_iter = int(max_iter)
+                            sig = self.SigFigures.text()
+                            if((sig != "" and self.isWholeNumber(sig)) or sig == ""):
+                                if(sig == ""):
+                                    sig = None
+                                else:
+                                    sig = int(sig)
+                                step_by_step = self.stepsBox.isChecked()
+                                fixed_point = FixedPoint(expression, x0, tol, max_iter, sig, step_by_step)
+                                try:
+                                    startTime = time.time()
+                                    res, it, ea = fixed_point.apply()
+                                    correctFig = floor(-int(math.log10(ea))) if ea != 0 else 0
+                                except ValueError as e:
+                                    QMessageBox.warning(self, "Error", f"An error occurred: {e}")
+                                else:
+                                    EndTime = time.time()
+                                    self.result.setText(f"Root: {res}\nRelative Error: {ea*100}%\n")
+                                    if correctFig != 0:
+                                        self.result.setText(self.result.toPlainText() + f"Correct to {correctFig} significant figures")
+                                    self.Iterations.setText(f"{it}")
+                                    self.time.setText(f"{EndTime - startTime}")
+                            else:
+                                QMessageBox.warning(self, "Validation Result", "Invalid number of significant figures!")
                         else:
                             QMessageBox.warning(self, "Validation Result", "Invalid maximum number of iterations!")
                     else:
@@ -352,24 +369,41 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                     x0 = float(guesses[0])
                     x1 = float(guesses[1])
                     tol = self.tolerance.text()
-                    if(tol != "" and self.is_number(tol)):
-                        tol = float(tol)
+                    if((tol != "" and self.is_number(tol)) or tol == ""):
+                        if(tol == ""):
+                            tol = 1e-5
+                        else:
+                            tol = float(tol)
                         max_iter = self.iterations.text()
-                        if(max_iter != "" and self.isWholeNumber(max_iter)):
-                            max_iter = int(max_iter)
-                            step_by_step = self.stepsBox.isChecked()
-                            secant = Secant(expression, x0, x1, tol, max_iter, step_by_step)
-                            try:
-                                startTime = time.time()
-                                res, it ,ea= secant.apply()
-                                correctFig = floor(2-int(math.log10(2*ea)))
-                            except ValueError as e:
-                                QMessageBox.warning(self, "Error", f"An error occurred: {e}")
+                        if((max_iter != "" and self.isWholeNumber(max_iter)) or max_iter == ""):
+                            if(max_iter == ""):
+                                max_iter = 50
                             else:
-                                EndTime = time.time()
-                                self.result.setText(f"Root: {res}\nRelative Error: {ea}\nCorrect to {correctFig} significant figures")
-                                self.Iterations.setText(f"{it}")
-                                self.time.setText(f"{EndTime - startTime}")
+                                max_iter = int(max_iter)
+                            sig = self.SigFigures.text()
+                            if((sig != "" and self.isWholeNumber(sig)) or sig == ""):
+                                if(sig == ""):
+                                    sig = None
+                                else:
+                                    sig = int(sig)
+                                step_by_step = self.stepsBox.isChecked()
+                                secant = Secant(expression, x0, x1, tol, max_iter, sig, step_by_step)
+                                try:
+                                    startTime = time.time()
+                                    res, it, ea ,steps= secant.apply()
+                                    correctFig = floor(-int(math.log10(ea))) if ea != 0 else 0
+                                except ValueError as e:
+                                    QMessageBox.warning(self, "Error", f"An error occurred: {e}")
+                                else:
+                                    EndTime = time.time()
+                                    self.result.setText(f"Root: {res}\nRelative Error: {ea*100}%\n")
+                                    if correctFig != 0:
+                                        self.result.setText(self.result.toPlainText() + f"Correct to {correctFig} significant figures")
+                                    self.steps.setText(steps)
+                                    self.Iterations.setText(f"{it}")
+                                    self.time.setText(f"{EndTime - startTime}")
+                            else:
+                                QMessageBox.warning(self, "Validation Result", "Invalid number of significant figures!")
                         else:
                             QMessageBox.warning(self, "Validation Result", "Invalid maximum number of iterations!")
                     else:
@@ -382,73 +416,158 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
         elif(self.NonLinearMethod.currentText()=="Bisection"):
             if(self.is_valid_sympy_expression(self.equation.toPlainText())):
                 expression = self.equation.toPlainText()
-                interval = self.NonLinearGuess.text().split(',')
-                if len(interval) == 2 and self.is_number(interval[0]) and self.is_number(interval[1]):
-                    a = float(interval[0])
-                    b = float(interval[1])
+                guesses = self.NonLinearGuess.text().split(',')
+                if len(guesses) == 2 and self.is_number(guesses[0]) and self.is_number(guesses[1]):
+                    x0 = float(guesses[0])
+                    x1 = float(guesses[1])
                     tol = self.tolerance.text()
-                    if(tol != "" and self.is_number(tol)):
-                        tol = float(tol)
+                    if((tol != "" and self.is_number(tol)) or tol == ""):
+                        if(tol == ""):
+                            tol = 1e-5
+                        else:
+                            tol = float(tol)
                         max_iter = self.iterations.text()
-                        if(max_iter != "" and self.isWholeNumber(max_iter)):
-                            max_iter = int(max_iter)
-                            step_by_step = self.stepsBox.isChecked()
-                            bisection = Bisection(expression, a, b, tol, max_iter, step_by_step)
-                            try:
-                                startTime = time.time()
-                                res, it, ea = bisection.solve()
-                                correctFig = floor(2-int(math.log10(2*ea)))
-                            except ValueError as e:
-                                QMessageBox.warning(self, "Error", f"An error occurred: {e}")
+                        if((max_iter != "" and self.isWholeNumber(max_iter)) or max_iter == ""):
+                            if(max_iter == ""):
+                                max_iter = 50
                             else:
-                                EndTime = time.time()
-                                self.result.setText(f"Root: {res}\nRelative Error: {ea}\nCorrect to {correctFig} significant figures")
-                                self.Iterations.setText(f"{it}")
-                                self.time.setText(f"{EndTime - startTime}")
-                               
+                                max_iter = int(max_iter)
+                            sig = self.SigFigures.text()
+                            if((sig != "" and self.isWholeNumber(sig)) or sig == ""):
+                                if(sig == ""):
+                                    sig = None
+                                else:
+                                    sig = int(sig)
+                                step_by_step = self.stepsBox.isChecked()
+                                bisection = Bisection(expression, x0, x1, tol, max_iter, sig, step_by_step)
+                                try:
+                                    startTime = time.time()
+                                    res, it, ea ,steps= bisection.solve()
+                                    correctFig = floor(-int(math.log10(ea))) if ea != 0 else 0
+                                except ValueError as e:
+                                    QMessageBox.warning(self, "Error", f"An error occurred: {e}")
+                                else:
+                                    EndTime = time.time()
+                                    self.result.setText(f"Root: {res}\nRelative Error:  {ea*100}%\n")
+                                    if correctFig != 0:
+                                        self.result.setText(self.result.toPlainText() + f"Correct to {correctFig} significant figures")
+                                    self.Iterations.setText(f"{it}")
+                                    self.steps.setText(steps)
+                                    self.time.setText(f"{EndTime - startTime}")
+                            else:
+                                QMessageBox.warning(self, "Validation Result", "Invalid number of significant figures!")
                         else:
                             QMessageBox.warning(self, "Validation Result", "Invalid maximum number of iterations!")
                     else:
                         QMessageBox.warning(self, "Validation Result", "Invalid tolerance!")
                 else:
-                    QMessageBox.warning(self, "Validation Result", "Invalid interval! Please enter a and b separated by a comma.")
+                    QMessageBox.warning(self, "Validation Result", "Invalid initial guesses! Please enter x0 and x1 separated by a comma.")
             else:
                 QMessageBox.warning(self, "Validation Result", "Invalid expression!")
 
         elif(self.NonLinearMethod.currentText()=="False-Position"):
             if(self.is_valid_sympy_expression(self.equation.toPlainText())):
                 expression = self.equation.toPlainText()
-                interval = self.NonLinearGuess.text().split(',')
-                if len(interval) == 2 and self.is_number(interval[0]) and self.is_number(interval[1]):
-                    a = float(interval[0])
-                    b = float(interval[1])
+                guesses = self.NonLinearGuess.text().split(',')
+                if len(guesses) == 2 and self.is_number(guesses[0]) and self.is_number(guesses[1]):
+                    x0 = float(guesses[0])
+                    x1 = float(guesses[1])
                     tol = self.tolerance.text()
-                    if(tol != "" and self.is_number(tol)):
-                        tol = float(tol)
+                    if((tol != "" and self.is_number(tol)) or tol == ""):
+                        if(tol == ""):
+                            tol = 1e-5
+                        else:
+                            tol = float(tol)
                         max_iter = self.iterations.text()
-                        if(max_iter != "" and self.isWholeNumber(max_iter)):
-                            max_iter = int(max_iter)
-                            step_by_step = self.stepsBox.isChecked()
-                            false_position = FalsePosition(expression, a, b, tol, max_iter, step_by_step)
-                            try:
-                                startTime = time.time()
-                                res, it, ea = false_position.solve()
-                                correctFig = floor(2-int(math.log10(2*ea)))
-                            except ValueError as e:
-                                QMessageBox.warning(self, "Error", f"An error occurred: {e}")
+                        if((max_iter != "" and self.isWholeNumber(max_iter)) or max_iter == ""):
+                            if(max_iter == ""):
+                                max_iter = 50
                             else:
-                                EndTime = time.time()
-                                self.result.setText(f"Root: {res}\nRelative Error: {ea}\nCorrect to {correctFig} significant figures")
-                                self.Iterations.setText(f"{it}")
-                                self.time.setText(f"{EndTime - startTime}")
+                                max_iter = int(max_iter)
+                            sig = self.SigFigures.text()
+                            if((sig != "" and self.isWholeNumber(sig)) or sig == ""):
+                                if(sig == ""):
+                                    sig = None
+                                else:
+                                    sig = int(sig)
+                                step_by_step = self.stepsBox.isChecked()
+                                false_position = FalsePosition(expression, x0, x1, tol, max_iter, sig, step_by_step)
+                                try:
+                                    startTime = time.time()
+                                    res, it, ea ,steps= false_position.solve()
+                                    correctFig = floor(-int(math.log10(ea))) if ea != 0 else 0
+                                except ValueError as e:
+                                    QMessageBox.warning(self, "Error", f"An error occurred: {e}")
+                                else:
+                                    EndTime = time.time()
+                                    self.result.setText(f"Root: {res}\nRelative Error:  {ea*100}%\n")
+                                    if correctFig != 0:
+                                        self.result.setText(self.result.toPlainText() + f"Correct to {correctFig} significant figures")
+                                    self.Iterations.setText(f"{it}")
+                                    self.steps.setText(steps)
+                                    self.time.setText(f"{EndTime - startTime}")
+                            else:
+                                QMessageBox.warning(self, "Validation Result", "Invalid number of significant figures!")
                         else:
                             QMessageBox.warning(self, "Validation Result", "Invalid maximum number of iterations!")
                     else:
                         QMessageBox.warning(self, "Validation Result", "Invalid tolerance!")
                 else:
-                    QMessageBox.warning(self, "Validation Result", "Invalid interval! Please enter a and b separated by a comma.")
+                    QMessageBox.warning(self, "Validation Result", "Invalid initial guesses! Please enter x0 and x1 separated by a comma.")
             else:
-                QMessageBox.warning(self, "Validation Result", "Invalid expression!")           
+                QMessageBox.warning(self, "Validation Result", "Invalid expression!")
+
+        elif(self.NonLinearMethod.currentText()=="Original Netwon Raphson" or self.NonLinearMethod.currentText()=="Modified Newton Raphson"):
+            m = 1 if self.NonLinearMethod.currentText() == "Original Netwon Raphson" else int(self.mult.text())
+            if(self.is_valid_sympy_expression(self.equation.toPlainText())):
+                expression = self.equation.toPlainText()
+                guess = self.NonLinearGuess.text()
+                if((self.SigFigures.text() != "" and self.isWholeNumber(self.SigFigures.text()) ) or self.SigFigures.text() == ""): 
+                    if(self.SigFigures.text() == ""):
+                        sig = None
+                    else:
+                        sig = self.SigFigures.text()
+                        sig = int(sig)
+                    if(guess != "" and self.is_number(guess)):
+                        x0 = float(guess)
+                        tol = self.tolerance.text()
+                        if((tol != "" and self.is_number(tol)) or tol == ""):
+                            if(tol == ""):
+                                tol = 1e-5
+                            else:   
+                                tol = float(tol)
+                            max_iter = self.iterations.text()
+                            if((max_iter != "" and self.isWholeNumber(max_iter)) or max_iter == ""):
+                                if(max_iter == ""):
+                                    max_iter = 50
+                                else:
+                                    max_iter = int(max_iter)
+                                step_by_step = self.stepsBox.isChecked()
+                                newton_raphson = NewtonRaphson(expression, x0, m, tol, sig, max_iter, step_by_step)
+                                try:
+                                    startTime = time.time()
+                                    res, it, ea,steps = newton_raphson.solve()
+                                    correctFig = floor(-int(math.log10(ea))) if ea != 0 else 0
+                                except ValueError as e:
+                                    QMessageBox.warning(self, "Error", f"An error occurred: {e}")
+                                else:
+                                    EndTime = time.time()
+                                    self.result.setText(f"Root: {res}\nRelative Error:  {ea*100}%\n")
+                                    if correctFig !=0:
+                                        self.result.setText(self.result.toPlainText()+f"Correct to {correctFig} significant figures") 
+                                    self.steps.setText(steps)
+                                    self.Iterations.setText(f"{it}")
+                                    self.time.setText(f"{EndTime - startTime}")
+                            else:
+                                QMessageBox.warning(self, "Validation Result", "Invalid maximum number of iterations!")
+                        else:
+                            QMessageBox.warning(self, "Validation Result", "Invalid tolerance!")
+                    else:
+                        QMessageBox.warning(self, "Validation Result", "Invalid initial guess!")
+                else:
+                    QMessageBox.warning(self, "Validation Result", "Invalid number of significant figures!")    
+            else:
+                QMessageBox.warning(self, "Validation Result", "Invalid expression!")
 
     def scale_matrix(self, A, B):
         n = A.shape[0]
