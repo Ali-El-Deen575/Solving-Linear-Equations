@@ -27,8 +27,8 @@ class NewtonRaphson:
         return rounded
 
     def solve(self ):
-        if not isinstance(self.m, int) or self.m < 1:
-            raise ValueError(f"The multiplicity 'm' must be an integer greater than or equal to 1 , entered {self.m}")
+       # if not isinstance(self.m, int) or self.m < 1:
+           # raise ValueError(f"The multiplicity 'm' must be an integer greater than or equal to 1 , entered {self.m}")
         
         
 
@@ -60,7 +60,7 @@ class NewtonRaphson:
             if fx == 0:
                 if self.step_by_step:
                     steps_string +=(f"\nSolution found at iteration {i+1}: {current_guess}\n")
-                return current_guess , i+1 , steps_string
+                return current_guess , i+1,0 , steps_string
             f_prime_x = self.sign_func(float(f_prime.subs(x, current_guess)))
             if self.modified and self.m == None:
                     f_prime_prime_x = self.sign_func(float(f_prime_prime.subs(x, current_guess)))
@@ -110,9 +110,9 @@ class NewtonRaphson:
 
 if __name__ == "__main__":
     x = symbols('x')
-    expression = "x**2 -4*x + 4"
+    expression = "(x-1)**3 +0.512"
     parsed_expr = sp(expression)
-    newton = NewtonRaphson(parsed_expr, 25 , modified=False,  m=1 , max_iterations=25 , step_by_step=True , sign=4)
-    root , iterations_num , steps = newton.solve()
+    newton = NewtonRaphson(parsed_expr, 2 , modified=True,  m=3 , max_iterations=100 , step_by_step=True , sign=None)
+    root , iterations_num,error , steps = newton.solve()
     print(f"Solution: {root} , Iterations: {iterations_num}")
     print(steps)

@@ -518,57 +518,65 @@ class Ui_MainWindow(QMainWindow,FORM_CLASS):
                 QMessageBox.warning(self, "Validation Result", "Invalid expression!")
 
         elif(self.NonLinearMethod.currentText()=="Original Netwon Raphson" or self.NonLinearMethod.currentText()=="Modified Newton Raphson"):
-            m = 1 if self.NonLinearMethod.currentText() == "Original Netwon Raphson" else int(self.mult.text())
-            if(self.is_valid_sympy_expression(self.equation.toPlainText())):
-                expression = self.equation.toPlainText()
-                guess = self.NonLinearGuess.text()
-                if((self.SigFigures.text() != "" and self.isWholeNumber(self.SigFigures.text()) ) or self.SigFigures.text() == ""): 
-                    if(self.SigFigures.text() == ""):
-                        sig = None
-                    else:
-                        sig = self.SigFigures.text()
-                        sig = int(sig)
-                    if(guess != "" and self.is_number(guess)):
-                        x0 = float(guess)
-                        tol = self.tolerance.text()
-                        if((tol != "" and self.is_number(tol)) or tol == ""):
-                            if(tol == ""):
-                                tol = 1e-5
-                            else:   
-                                tol = float(tol)
-                            max_iter = self.iterations.text()
-                            if((max_iter != "" and self.isWholeNumber(max_iter)) or max_iter == ""):
-                                if(max_iter == ""):
-                                    max_iter = 50
-                                else:
-                                    max_iter = int(max_iter)
-                                step_by_step = self.stepsBox.isChecked()
-                                newton_raphson = NewtonRaphson(expression, x0, m, tol, sig, max_iter, step_by_step)
-                                try:
-                                    startTime = time.time()
-                                    res, it, ea,steps = newton_raphson.solve()
-                                    correctFig = floor(-int(math.log10(ea))) if ea != 0 else 0
-                                except ValueError as e:
-                                    QMessageBox.warning(self, "Error", f"An error occurred: {e}")
-                                else:
-                                    EndTime = time.time()
-                                    self.result.setText(f"Root: {res}\nRelative Error:  {ea*100}%\n")
-                                    if correctFig !=0:
-                                        self.result.setText(self.result.toPlainText()+f"Correct to {correctFig} significant figures") 
-                                    self.steps.setText(steps)
-                                    self.Iterations.setText(f"{it}")
-                                    self.time.setText(f"{EndTime - startTime}")
-                            else:
-                                QMessageBox.warning(self, "Validation Result", "Invalid maximum number of iterations!")
-                        else:
-                            QMessageBox.warning(self, "Validation Result", "Invalid tolerance!")
-                    else:
-                        QMessageBox.warning(self, "Validation Result", "Invalid initial guess!")
-                else:
-                    QMessageBox.warning(self, "Validation Result", "Invalid number of significant figures!")    
+            if(self.NonLinearMethod.currentText()=="Original Netwon Raphson"):
+                m = 1
+                modified = False
             else:
-                QMessageBox.warning(self, "Validation Result", "Invalid expression!")
-
+                modified = True 
+                m = self.mult.text()
+            if(m == "" or(m!="" and self.isWholeNumber(m))):
+                m = None if m == "" else int(m)    
+                if(self.is_valid_sympy_expression(self.equation.toPlainText())):
+                    expression = self.equation.toPlainText()
+                    guess = self.NonLinearGuess.text()
+                    if((self.SigFigures.text() != "" and self.isWholeNumber(self.SigFigures.text()) ) or self.SigFigures.text() == ""): 
+                        if(self.SigFigures.text() == ""):
+                            sig = None
+                        else:
+                            sig = self.SigFigures.text()
+                            sig = int(sig)
+                        if(guess != "" and self.is_number(guess)):
+                            x0 = float(guess)
+                            tol = self.tolerance.text()
+                            if((tol != "" and self.is_number(tol)) or tol == ""):
+                                if(tol == ""):
+                                    tol = 1e-5
+                                else:   
+                                    tol = float(tol)
+                                max_iter = self.iterations.text()
+                                if((max_iter != "" and self.isWholeNumber(max_iter)) or max_iter == ""):
+                                    if(max_iter == ""):
+                                        max_iter = 50
+                                    else:
+                                        max_iter = int(max_iter)
+                                    step_by_step = self.stepsBox.isChecked()
+                                    newton_raphson = NewtonRaphson(expression, x0,modified, m, tol, sig, max_iter, step_by_step)
+                                    try:
+                                        startTime = time.time()
+                                        res, it, ea,steps = newton_raphson.solve()
+                                        correctFig = floor(-int(math.log10(ea))) if ea != 0 else 0
+                                    except ValueError as e:
+                                        QMessageBox.warning(self, "Error", f"An error occurred: {e}")
+                                    else:
+                                        EndTime = time.time()
+                                        self.result.setText(f"Root: {res}\nRelative Error:  {ea*100}%\n")
+                                        if correctFig !=0:
+                                            self.result.setText(self.result.toPlainText()+f"Correct to {correctFig} significant figures") 
+                                        self.steps.setText(steps)
+                                        self.Iterations.setText(f"{it}")
+                                        self.time.setText(f"{EndTime - startTime}")
+                                else:
+                                    QMessageBox.warning(self, "Validation Result", "Invalid maximum number of iterations!")
+                            else:
+                                QMessageBox.warning(self, "Validation Result", "Invalid tolerance!")
+                        else:
+                            QMessageBox.warning(self, "Validation Result", "Invalid initial guess!")
+                    else:
+                        QMessageBox.warning(self, "Validation Result", "Invalid number of significant figures!")    
+                else:
+                    QMessageBox.warning(self, "Validation Result", "Invalid expression!")
+            else:
+                QMessageBox.warning(self, "Validation Result", "Invalid value for m!") 
     def scale_matrix(self, A, B):
         n = A.shape[0]
         for i in range(n):
